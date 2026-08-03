@@ -12,16 +12,18 @@
       
       <div class="vp-trust-pills">
         <span class="vp-pill">✓ 100% Satisfaction Guarantee</span>
-        <span class="vp-pill">✓ Instant Bulk Tiers</span>
-        <span class="vp-pill">✓ Custom Artwork Upload</span>
+        <span class="vp-pill">✓ Instant Bulk Volume Tiers</span>
+        <span class="vp-pill">✓ Custom Logo &amp; Artwork Upload</span>
         <span class="vp-pill">★ 4.9/5 Star Rated</span>
       </div>
     </div>
     <div class="vp-hero-art">
       {% if "packaging" in category.slug %}
         <img src="{% static 'images/trending-packaging-perspective.jpg' %}" alt="{{ category.name }}">
-      {% elif "apparel" in category.slug %}
+      {% elif "apparel" in category.slug or "tshirt" in category.slug %}
         <img src="{% static 'images/vp-apparel-hero.jpg' %}" alt="{{ category.name }}">
+      {% elif "id-card" in category.slug %}
+        <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="{{ category.name }}">
       {% elif "stationery" in category.slug %}
         <img src="{% static 'images/vp-stationery-hero.jpg' %}" alt="{{ category.name }}">
       {% elif "signage" in category.slug %}
@@ -35,7 +37,7 @@
   </div>
 </section>
 
-<!-- Category Selector Bar -->
+<!-- Category Selector Bar (Live Dynamic DB Categories) -->
 <section class="wrap vp-filter-bar">
   <div class="vp-tabs">
     {% for cat in all_categories %}
@@ -63,7 +65,7 @@
       <p>{{ product.short_description }}</p>
 
       <div class="vp-specs-summary">
-        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>Fast Dispatch</span>
+        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>Fast Express Dispatch</span>
       </div>
 
       <div class="vp-price-row">
@@ -87,7 +89,7 @@
   </article>
   {% empty %}
   <div class="empty-state">
-    <p>No products found in this category yet.</p>
+    <p>No products found in {{ category.name }} yet.</p>
   </div>
   {% endfor %}
 </section>
