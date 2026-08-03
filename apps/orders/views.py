@@ -2,6 +2,7 @@ import json
 from decimal import Decimal
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from apps.catalog.models import Product, ProductVariant
 from .models import Cart, CartItem
@@ -18,57 +19,70 @@ def _get_cart(request):
         cart, _ = Cart.objects.get_or_create(session_key=session_key, is_active=True)
     return cart
 
+@csrf_exempt
 @require_POST
 def add_to_cart(request):
-    cart = _get_cart(request)
-    
     try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        data = request.POST
+        cart = _get_cart(request)
+        
+        try:
+            data = json.loads(request.body)
+        except (json.JSONDecodeError, TypeError):
+            data = request.POST
 
-    product_id = data.get("product_id")
-    quantity = int(data.get("quantity", 100))
-    paper = data.get("paper", "Standard Matte (300gsm)")
-    corners = data.get("corners", "Square")
-    sides = data.get("sides", "Front Only")
-    orientation = data.get("orientation", "Horizontal")
-    calculated_total = Decimal(str(data.get("total_price", "190.00")))
-    
-    product = get_object_or_404(Product, id=product_id)
-    variant = product.variants.first()
+        product_id = data.get("product_id")
+        if not product_id:
+            return JsonResponse({"success": False, "message": "Missing product ID"}, status=400)
 
-    specifications = {
-        "paper": paper,
-        "corners": corners,
-        "sides": sides,
-        "orientation": orientation,
-        "unit_price": str(round(calculated_total / quantity, 2)),
-        "total_price": str(calculated_total),
-    }
+        quantity = int(data.get("quantity", 100))
+        paper = data.get("paper", "Standard")
+        corners = data.get("corners", "Standard")
+        sides = data.get("sides", "Standard")
+        orientation = data.get("orientation", "Horizontal")
+        
+        raw_price = str(data.get("total_price", "190.00")).replace(",", "").replace("₹", "").strip()
+        try:
+            calculated_total = Decimal(raw_price)
+        except Exception:
+            calculated_total = Decimal("190.00")
+        
+        product = get_object_or_404(Product, id=product_id)
+        variant = product.variants.first()
 
-    cart_item, created = CartItem.objects.get_or_create(
-        cart=cart,
-        product=product,
-        variant=variant,
-        defaults={"quantity": quantity, "specifications": specifications}
-    )
-    if not created:
-        cart_item.quantity += quantity
-        # update specs total
-        curr_total = Decimal(cart_item.specifications.get("total_price", "0")) + calculated_total
-        cart_item.specifications["total_price"] = str(curr_total)
-        cart_item.save()
+        unit_p = str(round(calculated_total / quantity, 2)) if quantity > 0 else "0.00"
 
-    total_items = sum(item.quantity for item in cart.items.all())
-    cart_count = cart.items.count()
+        specifications = {
+            "paper": paper,
+            "corners": corners,
+            "sides": sides,
+            "orientation": orientation,
+            "unit_price": unit_p,
+            "total_price": str(calculated_total),
+        }
 
-    return JsonResponse({
-        "success": True,
-        "message": f"Added {quantity} x {product.name} to your cart!",
-        "cart_count": cart_count,
-        "total_items": total_items,
-    })
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=product,
+            variant=variant,
+            defaults={"quantity": quantity, "specifications": specifications}
+        )
+        if not created:
+            cart_item.quantity += quantity
+            curr_total = Decimal(cart_item.specifications.get("total_price", "0")) + calculated_total
+            cart_item.specifications["total_price"] = str(curr_total)
+            cart_item.save()
+
+        total_items = sum(item.quantity for item in cart.items.all())
+        cart_count = cart.items.count()
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Added {quantity} x {product.name} to cart!",
+            "cart_count": cart_count,
+            "total_items": total_items,
+        })
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=400)
 
 def cart_detail(request):
     cart = _get_cart(request)
