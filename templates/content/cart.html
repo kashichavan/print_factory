@@ -1,0 +1,110 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}Your Shopping Cart | The Print Planet{% endblock %}
+
+{% block content %}
+<section class="wrap section cart-page">
+  <div class="cart-header">
+    <h1>Your Print Cart</h1>
+    <p>Review custom specifications and proceed to instant checkout.</p>
+  </div>
+
+  {% if items %}
+  <div class="cart-grid">
+    <!-- Left Column: Item List -->
+    <div class="cart-items-col">
+      {% for item in items %}
+      <article class="cart-item-card">
+        <div class="cart-item-header">
+          <div class="cart-item-media">
+            <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+          </div>
+
+          <div class="cart-item-title-box">
+            <h3>{{ item.product.name }}</h3>
+            <span class="cart-unit-rate">Unit rate: ₹{{ item.specifications.unit_price }}/pc</span>
+          </div>
+
+          <div class="cart-item-price">
+            <strong>₹{{ item.specifications.total_price }}</strong>
+          </div>
+        </div>
+
+        <div class="cart-spec-badges">
+          <span class="spec-chip">📦 Qty: <b>{{ item.quantity }} units</b></span>
+          {% if item.specifications.paper %}
+            <span class="spec-chip">📄 {{ item.specifications.paper }}</span>
+          {% endif %}
+          {% if item.specifications.corners %}
+            <span class="spec-chip">✂ {{ item.specifications.corners }}</span>
+          {% endif %}
+          {% if item.specifications.sides %}
+            <span class="spec-chip">🖨 {{ item.specifications.sides }}</span>
+          {% endif %}
+        </div>
+
+        <div class="cart-item-foot">
+          <form method="POST" action="{% url 'orders:remove_from_cart' item.id %}" style="margin:0">
+            {% csrf_token %}
+            <button type="submit" class="cart-remove-btn">Remove Item 🗑</button>
+          </form>
+        </div>
+      </article>
+      {% endfor %}
+
+      <div class="cart-continue">
+        <a href="{% url 'content:business_cards' %}" class="text-link">← Add More Business Cards</a>
+      </div>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <div class="cart-summary-col">
+      <div class="cart-summary-card">
+        <h2>Order Summary</h2>
+
+        <div class="summary-line">
+          <span>Subtotal ({{ items.count }} items)</span>
+          <strong>₹{{ subtotal }}</strong>
+        </div>
+
+        <div class="summary-line">
+          <span>GST (18% Estimated)</span>
+          <span>₹{{ tax }}</span>
+        </div>
+
+        <div class="summary-line">
+          <span>Shipping &amp; Courier</span>
+          {% if shipping == 0 %}
+            <span class="free-shipping">FREE (Order > ₹999)</span>
+          {% else %}
+            <span>₹{{ shipping }}</span>
+          {% endif %}
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-line total">
+          <span>Grand Total</span>
+          <strong>₹{{ grand_total }}</strong>
+        </div>
+
+        <button type="button" class="button button-dark cart-checkout-btn" onclick="alert('Order placed successfully! In a live environment, this connects to Razorpay/Stripe checkout.')">
+          Proceed to Checkout ↗
+        </button>
+
+        <div class="cart-guarantee">
+          <span>🔒 256-Bit SSL Encrypted Checkout</span>
+          <span>🚚 Fast Dispatch across India</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="cart-empty-state">
+    <div class="empty-icon">🛒</div>
+    <h2>Your cart is currently empty</h2>
+    <p>Explore Vistaprint-style business cards, custom packaging, and corporate gifting to build your brand.</p>
+    <a href="{% url 'content:business_cards' %}" class="button button-dark">Browse Business Cards ↗</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

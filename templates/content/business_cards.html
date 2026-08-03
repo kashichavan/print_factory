@@ -1,0 +1,351 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}Custom Business Cards Printing | Vistaprint Storefront | The Print Planet{% endblock %}
+
+{% block content %}
+<!-- Vistaprint UI Hero Banner -->
+<section class="vp-hero">
+  <div class="wrap vp-hero-inner">
+    <div class="vp-hero-copy">
+      <div class="vp-badge">✦ VISTAPRINT INDIA QUALITY</div>
+      <h1>Business Cards</h1>
+      <p class="vp-hero-lead">Create standard, textured, metallic foil, rounded corner, and luxury cotton cards. Designed to make your first handshake unforgettable.</p>
+      
+      <div class="vp-trust-pills">
+        <span class="vp-pill">✓ 100% Quality Guarantee</span>
+        <span class="vp-pill">⚡ 24hr Express Dispatch</span>
+        <span class="vp-pill">🎨 Free Digital Proofing</span>
+        <span class="vp-pill">★ 4.9/5 Star Rated</span>
+      </div>
+    </div>
+    <div class="vp-hero-art">
+      <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Vistaprint Style Custom Business Cards">
+    </div>
+  </div>
+</section>
+
+<!-- Filter Bar & Category Tabs (Dynamic DB Driven) -->
+<section class="wrap vp-filter-bar">
+  <div class="vp-tabs">
+    <button type="button" class="vp-tab active" onclick="filterCards('all', this)">All Business Cards</button>
+    <button type="button" class="vp-tab" onclick="filterCards('standard', this)">Standard Cards</button>
+    <button type="button" class="vp-tab" onclick="filterCards('metallic', this)">3D Spot UV &amp; Metallic Foil</button>
+    <button type="button" class="vp-tab" onclick="filterCards('rounded', this)">Rounded Corner Cards</button>
+    <button type="button" class="vp-tab" onclick="filterCards('luxury', this)">Luxury Cotton Cards</button>
+  </div>
+  <div class="vp-filter-info">
+    <span>Showing <b>{{ products.paginator.count }} DB Products</b> · Live Database Sync</span>
+  </div>
+</section>
+
+<!-- Product Catalog Grid (Live DB Driven) -->
+<section class="wrap vp-catalog-grid">
+  {% for product in products %}
+  <article class="vp-product-card" data-category="{{ product.slug }}">
+    <a href="{% url 'content:product_detail' product.slug %}" class="vp-card-media" style="display:block">
+      <span class="vp-card-tag gold">★ {{ product.badge|default:"Bestseller" }}</span>
+      <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+    </a>
+
+    <div class="vp-card-content">
+      <h3><a href="{% url 'content:product_detail' product.slug %}" style="text-decoration:none;color:inherit">{{ product.name }}</a></h3>
+      <p>{{ product.short_description }}</p>
+
+      <div class="vp-specs-summary">
+        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>24hr Shipping</span>
+      </div>
+
+      <div class="vp-price-row">
+        <div class="vp-price">
+          <span class="vp-from">Starting at</span>
+          <strong class="vp-amount">₹{{ product.base_price }}</strong>
+          <span class="vp-qty">live DB price</span>
+        </div>
+        
+        <button type="button" class="vp-btn-customize" 
+                onclick="openCustomizerModal(
+                  '{{ product.id }}', 
+                  '{{ product.name|escapejs }}', 
+                  '{{ product.base_price }}',
+                  '{{ product.get_image_url|escapejs }}'
+                )">
+          Customise &amp; Buy ↗
+        </button>
+      </div>
+    </div>
+  </article>
+  {% empty %}
+  <div class="empty-state">
+    <p>No business cards found in database.</p>
+  </div>
+  {% endfor %}
+</section>
+
+<!-- Pagination Bar -->
+{% if products.has_other_pages %}
+<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 60px">
+  {% if products.has_previous %}
+    <a href="?page={{ products.previous_page_number }}" class="vp-tab">← Previous</a>
+  {% endif %}
+  <span style="font-size:13px;font-weight:700;color:var(--muted)">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+  {% if products.has_next %}
+    <a href="?page={{ products.next_page_number }}" class="vp-tab">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- 100% DYNAMIC DATABASE CUSTOMIZER MODAL (Zero Hardcoded Options) -->
+<div id="customizer-modal" class="vp-modal-overlay">
+  <div class="vp-modal-box">
+    <button class="vp-modal-close" onclick="closeCustomizerModal()">✕</button>
+
+    <div class="vp-modal-header">
+      <h2 id="modal-product-name">Product Customizer</h2>
+      <p>Configure custom specifications loaded dynamically from database records.</p>
+    </div>
+
+    <div class="vp-modal-body">
+      <!-- Left Column: Media & Artwork Upload -->
+      <div class="vp-modal-preview">
+        <img id="modal-product-img" src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Product Preview">
+
+        <div class="vp-file-upload-box">
+          <p><strong>Upload Ready Print Artwork</strong></p>
+          <small>Supported: PDF, AI, PSD, High-Res PNG (Min 300 DPI)</small>
+          <input type="file" id="modal-file-input" class="vp-file-input" accept=".pdf,.ai,.psd,.png,.jpg">
+        </div>
+      </div>
+
+      <!-- Right Column: Dynamic DB Render Form Container -->
+      <div class="vp-modal-form" id="dynamic-modal-form-container">
+        <div style="padding:40px 0;text-align:center;color:var(--muted)">
+          <span>Loading specifications from database... ⏳</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer with Calculated Total -->
+    <div class="vp-modal-footer">
+      <div class="vp-modal-price-calc">
+        <span>Calculated Subtotal:</span>
+        <strong id="modal-calc-price">₹0.00</strong>
+        <small id="modal-per-unit">₹0.00 / unit</small>
+      </div>
+
+      <button type="button" id="btn-add-cart-main" class="vp-btn-add-cart" onclick="submitAddToCart()">
+        Add to Cart 🛒
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentProductId = null;
+let currentProductData = null;
+
+function openCustomizerModal(id, name, basePrice, imgUrl) {
+  currentProductId = id;
+  
+  document.getElementById('modal-product-name').innerText = name;
+  document.getElementById('modal-product-img').src = imgUrl;
+  document.getElementById('customizer-modal').classList.add('is-open');
+  
+  const container = document.getElementById('dynamic-modal-form-container');
+  container.innerHTML = '<div style="padding:40px 0;text-align:center;color:var(--muted)"><span>Loading specifications from database... ⏳</span></div>';
+
+  // Fetch 100% DB-driven options & price rules for this exact product
+  fetch(`/api/catalog/api/product/${id}/options/`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.product) {
+        currentProductData = data.product;
+        renderDynamicForm(data.product);
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching DB product options:', err);
+      container.innerHTML = '<div style="padding:20px;color:red">Failed to load options from database.</div>';
+    });
+}
+
+function renderDynamicForm(product) {
+  const container = document.getElementById('dynamic-modal-form-container');
+  container.innerHTML = '';
+
+  // 1. Render Dynamic Quantity Tiers from DB price_rules
+  if (product.price_rules && product.price_rules.length > 0) {
+    const qtyGroup = document.createElement('div');
+    qtyGroup.className = 'vp-form-group';
+    qtyGroup.innerHTML = '<label>1. Select Quantity Tier (DB Driven)</label>';
+
+    const qtyGrid = document.createElement('div');
+    qtyGrid.className = 'vp-qty-grid';
+
+    product.price_rules.forEach((rule, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `vp-qty-btn ${idx === 0 ? 'active' : ''}`;
+      btn.setAttribute('data-qty', rule.qty);
+      btn.setAttribute('data-price', rule.price);
+      btn.onclick = function() { selectQty(this); };
+
+      btn.innerHTML = `<b>${rule.qty.toLocaleString()}</b><span>₹${rule.price}</span>`;
+      qtyGrid.appendChild(btn);
+    });
+
+    qtyGroup.appendChild(qtyGrid);
+    container.appendChild(qtyGroup);
+  }
+
+  // 2. Render Dynamic Option Chips for every ProductOption & OptionValue in DB
+  if (product.options && product.options.length > 0) {
+    product.options.forEach((opt, optIdx) => {
+      const optGroup = document.createElement('div');
+      optGroup.className = 'vp-form-group';
+      optGroup.innerHTML = `<label>${optIdx + 2}. ${opt.name}</label>`;
+
+      const chipContainer = document.createElement('div');
+      chipContainer.className = 'vp-option-chips';
+
+      opt.values.forEach((val, valIdx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `vp-chip ${valIdx === 0 ? 'active' : ''}`;
+        chip.setAttribute('data-name', opt.code);
+        chip.setAttribute('data-val', val.label);
+        chip.setAttribute('data-extra', val.price_modifier);
+        chip.onclick = function() { selectChip(this); };
+
+        chip.innerText = val.label;
+        chipContainer.appendChild(chip);
+      });
+
+      optGroup.appendChild(chipContainer);
+      container.appendChild(optGroup);
+    });
+  }
+
+  recalculatePrice();
+}
+
+function closeCustomizerModal() {
+  document.getElementById('customizer-modal').classList.remove('is-open');
+}
+
+function selectQty(btn) {
+  btn.parentElement.querySelectorAll('.vp-qty-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalculatePrice();
+}
+
+function selectChip(btn) {
+  btn.parentElement.querySelectorAll('.vp-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalculatePrice();
+}
+
+function recalculatePrice() {
+  const qtyBtn = document.querySelector('.vp-qty-btn.active');
+  if (!qtyBtn) return;
+
+  const qty = parseInt(qtyBtn.getAttribute('data-qty'));
+  const baseTierPrice = parseFloat(qtyBtn.getAttribute('data-price'));
+
+  let extraSum = 0;
+  document.querySelectorAll('.vp-chip.active').forEach(chip => {
+    extraSum += parseFloat(chip.getAttribute('data-extra') || 0);
+  });
+
+  const total = baseTierPrice + extraSum;
+  const perUnit = (total / qty).toFixed(2);
+
+  document.getElementById('modal-calc-price').innerText = `₹${total.toFixed(2)}`;
+  document.getElementById('modal-per-unit').innerText = `₹${perUnit} / unit`;
+}
+
+function submitAddToCart() {
+  if (!currentProductId) return;
+
+  const btn = document.getElementById('btn-add-cart-main');
+  btn.disabled = true;
+  btn.innerText = 'Adding to Cart... ⏳';
+
+  const qtyBtn = document.querySelector('.vp-qty-btn.active');
+  const qty = qtyBtn ? parseInt(qtyBtn.getAttribute('data-qty')) : 100;
+  
+  const paperChip = document.querySelector('.vp-chip.active[data-name="paper"]');
+  const cornersChip = document.querySelector('.vp-chip.active[data-name="corners"]');
+  const sidesChip = document.querySelector('.vp-chip.active[data-name="sides"]');
+
+  const priceText = document.getElementById('modal-calc-price').innerText.replace('₹', '');
+
+  const payload = {
+    product_id: currentProductId,
+    quantity: qty,
+    paper: paperChip ? paperChip.getAttribute('data-val') : 'Standard Matte (300gsm)',
+    corners: cornersChip ? cornersChip.getAttribute('data-val') : 'Square',
+    sides: sidesChip ? sidesChip.getAttribute('data-val') : 'Front Only',
+    total_price: priceText
+  };
+
+  fetch('/cart/add/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      btn.innerText = 'Added! ✓';
+      updateCartBadge(data.cart_count);
+      showToast(data.message);
+      setTimeout(() => {
+        closeCustomizerModal();
+        btn.disabled = false;
+        btn.innerText = 'Add to Cart 🛒';
+      }, 500);
+    }
+  })
+  .catch(err => {
+    console.error('Error adding to cart:', err);
+    btn.disabled = false;
+    btn.innerText = 'Add to Cart 🛒';
+    closeCustomizerModal();
+  });
+}
+
+function filterCards(cat, btn) {
+  document.querySelectorAll('.vp-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const cards = document.querySelectorAll('.vp-product-card');
+  cards.forEach(card => {
+    const slug = card.getAttribute('data-category');
+    if (cat === 'all') {
+      card.style.display = 'flex';
+    } else if (slug.includes(cat)) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}

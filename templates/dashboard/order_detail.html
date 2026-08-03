@@ -1,0 +1,102 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block title %}Manage Order #{{ order.number }} | Owner Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-heading">
+  <div>
+    <p class="eyebrow">ORDER MANAGEMENT</p>
+    <h1>Order #{{ order.number }}</h1>
+    <p class="dash-copy">Placed on {{ order.created_at|date:'d F Y, H:i' }}</p>
+  </div>
+  <a href="{% url 'dashboard:order_list' %}" class="text-link">← Back to Orders</a>
+</div>
+
+<div class="order-detail-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:30px">
+  <!-- Left Column: Items & Customer Feedback -->
+  <div>
+    <!-- Order Items Table -->
+    <div class="glass-panel" style="padding:28px;background:#ffffff;margin-bottom:30px">
+      <h2 style="font:700 24px Fraunces,serif;margin:0 0 20px">Ordered Items</h2>
+
+      {% for item in order.items.all %}
+      <div class="cart-item-card" style="margin-bottom:16px">
+        <div class="cart-item-media">
+          <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+        </div>
+        <div class="cart-item-details">
+          <h3>{{ item.product.name }}</h3>
+          <div class="cart-spec-badges">
+            <span class="spec-chip">Qty: {{ item.quantity }} pcs</span>
+            {% if item.unit_price %}
+              <span class="spec-chip">Unit: ₹{{ item.unit_price }}</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="cart-item-price">
+          <strong>₹{{ item.total_price }}</strong>
+        </div>
+      </div>
+      {% empty %}
+      <p style="color:var(--muted)">No item records linked.</p>
+      {% endfor %}
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #1e223015;display:flex;justify-content:space-between">
+        <span>Grand Total Amount</span>
+        <strong style="font-size:24px;color:var(--ink)">₹{{ order.total_amount }}</strong>
+      </div>
+    </div>
+
+    <!-- Customer Feedback & Approval Card -->
+    <div class="glass-panel" style="padding:28px;background:#ffffff">
+      <h2 style="font:700 24px Fraunces,serif;margin:0 0 16px">Customer Artwork Approval &amp; Feedback</h2>
+      <div class="pdp-specs-table">
+        <div class="pdp-spec-row">
+          <span>Artwork File Proof Status</span>
+          <b style="color:#059669">✓ Approved by Customer</b>
+        </div>
+        <div class="pdp-spec-row">
+          <span>Production Job Number</span>
+          <b>JOB-{{ order.number }}</b>
+        </div>
+        <div class="pdp-spec-row">
+          <span>Customer Delivery Notes</span>
+          <b>{{ order.notes|default:"Standard Safe Packaging" }}</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Status & Carrier Tracking Form -->
+  <div>
+    <div class="glass-panel" style="padding:28px;background:#ffffff">
+      <h2 style="font:700 24px Fraunces,serif;margin:0 0 20px">Update Order Status</h2>
+
+      <form method="post" class="dash-dynamic-form">
+        {% csrf_token %}
+        <label>
+          <b>Current Order Status</b>
+          {{ form.status }}
+        </label>
+
+        <label>
+          <b>Courier / Shipping Carrier</b>
+          <input type="text" name="carrier" value="{{ form.carrier.value|default:'' }}" placeholder="e.g. BlueDart / Delhivery / DTDC">
+        </label>
+
+        <label>
+          <b>Tracking / AWB Number</b>
+          <input type="text" name="tracking_number" value="{{ form.tracking_number.value|default:'' }}" placeholder="e.g. AWB-984021482">
+        </label>
+
+        <label>
+          <b>Internal Staff Notes</b>
+          {{ form.notes }}
+        </label>
+
+        <button type="submit" class="button button-dark" style="width:100%;margin-top:12px;justify-content:center">Save Order Update ↗</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

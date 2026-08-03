@@ -1,0 +1,333 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}{{ product.name }} | Detailed Specs &amp; Customization | The Print Planet{% endblock %}
+
+{% block content %}
+<!-- Flipkart / Amazon Style Breadcrumb Bar -->
+<div class="wrap vp-breadcrumb-bar">
+  <a href="{% url 'content:home' %}">Home</a> &gt;
+  <a href="{% url 'content:category_detail' product.category.slug %}">{{ product.category.name }}</a> &gt;
+  <span>{{ product.name }}</span>
+</div>
+
+<!-- Main Product Detail Grid (Amazon / Flipkart Layout) -->
+<section class="wrap vp-product-detail-grid">
+  <!-- Left Column: Gallery & Image Preview -->
+  <div class="vp-gallery-col">
+    <div class="vp-main-preview-card glass-panel">
+      <img id="pdp-main-image" src="{{ product.get_image_url }}" alt="{{ product.name }}">
+      <span class="pdp-badge-pill">★ {{ product.badge|default:"Top Choice" }}</span>
+    </div>
+
+    <!-- Image Thumbnail Carousel -->
+    <div class="pdp-thumb-strip">
+      <div class="pdp-thumb active" onclick="switchMainImage('{{ product.get_image_url }}', this)">
+        <img src="{{ product.get_image_url }}" alt="Main View">
+      </div>
+      <div class="pdp-thumb" onclick="switchMainImage('{% static "images/trending-cards-perspective.jpg" %}', this)">
+        <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Perspective View">
+      </div>
+      <div class="pdp-thumb" onclick="switchMainImage('{% static "images/trending-packaging-perspective.jpg" %}', this)">
+        <img src="{% static 'images/trending-packaging-perspective.jpg' %}" alt="Unboxing View">
+      </div>
+      <div class="pdp-thumb" onclick="switchMainImage('{% static "images/trending-gifting-perspective.jpg" %}', this)">
+        <img src="{% static 'images/trending-gifting-perspective.jpg' %}" alt="Merch View">
+      </div>
+    </div>
+
+    <!-- Trust Badges Block -->
+    <div class="pdp-trust-block glass-panel">
+      <div class="pdp-trust-item">
+        <span class="pdp-trust-icon">🚚</span>
+        <div><b>Fast Dispatch</b><small>Standard 2-3 Business Days</small></div>
+      </div>
+      <div class="pdp-trust-item">
+        <span class="pdp-trust-icon">🔒</span>
+        <div><b>100% Quality Assurance</b><small>Free Reprint if Defective</small></div>
+      </div>
+      <div class="pdp-trust-item">
+        <span class="pdp-trust-icon">🎨</span>
+        <div><b>Color Match Guarantee</b><small>Pantone Calibration</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Interactive Buying & Customization Panel -->
+  <div class="vp-buy-col glass-panel">
+    <div class="pdp-header">
+      <span class="pdp-category-tag">{{ product.category.name }}</span>
+      <h1 class="pdp-title">{{ product.name }}</h1>
+      <p class="pdp-short-desc">{{ product.short_description }}</p>
+
+      <!-- Rating & Review Count (Amazon / Flipkart Style) -->
+      <div class="pdp-rating-row">
+        <span class="pdp-stars">★ {{ product.rating }}</span>
+        <span class="pdp-review-count">({{ product.review_count }} Verified Ratings &amp; Reviews)</span>
+        <span class="pdp-stock-status">✓ In Stock &amp; Ready to Print</span>
+      </div>
+    </div>
+
+    <div class="pdp-divider"></div>
+
+    <!-- Flipkart Dynamic Pricing Bar -->
+    <div class="pdp-price-box">
+      <div class="pdp-price-main">
+        <span class="pdp-currency">₹</span>
+        <strong id="pdp-calc-total">{{ product.base_price }}</strong>
+        <span class="pdp-mrp">M.R.P.: <del id="pdp-calc-mrp">₹0.00</del></span>
+        <span class="pdp-discount-tag">Save 40% OFF</span>
+      </div>
+      <small id="pdp-per-unit-rate" class="pdp-unit-rate">Calculated rate per item</small>
+    </div>
+
+    <!-- Dynamic DB Rendered Option Selectors -->
+    <div class="pdp-options-container" id="pdp-dynamic-options-container">
+      <div style="padding:20px 0;color:var(--muted)">Loading product options from database... ⏳</div>
+    </div>
+
+    <!-- Pincode Delivery Checker -->
+    <div class="pdp-option-group" style="margin-bottom:20px">
+      <label class="pdp-option-label">Delivery Check</label>
+      <div class="pdp-pincode-box">
+        <input type="text" id="pincode-input" placeholder="Enter 6-digit Pincode" value="560001">
+        <button type="button" onclick="checkPincode()">Check</button>
+      </div>
+      <small id="pincode-result" style="color:#059669;font-weight:700;display:block;margin-top:6px">✓ Express Delivery Available by Thursday</small>
+    </div>
+
+    <!-- Artwork Upload Box -->
+    <div class="vp-file-upload-box" style="margin-bottom:24px">
+      <p>📁 <b>Upload Custom Logo / Artwork File</b></p>
+      <small>Supported Formats: PDF, AI, PSD, SVG, PNG (Max 50MB)</small>
+      <input type="file" class="vp-file-input">
+    </div>
+
+    <!-- Flipkart Dual Action CTA Buttons -->
+    <div class="pdp-action-bar">
+      <button type="button" id="pdp-cart-btn" class="pdp-btn-cart" onclick="submitPdpAddToCart(false)">Add to Cart 🛒</button>
+      <button type="button" id="pdp-buy-btn" class="pdp-btn-buy" onclick="submitPdpAddToCart(true)">Buy Now ⚡</button>
+    </div>
+  </div>
+</section>
+
+<!-- Product Tabs (Details, Specs, Reviews) -->
+<section class="wrap vp-pdp-tabs-section">
+  <div class="glass-panel" style="padding:35px;background:#ffffff">
+    <h2 style="font:700 28px Fraunces,serif;margin:0 0 16px">Product Overview &amp; Specifications</h2>
+    <p style="font-size:15px;color:#555760;line-height:1.6;margin-bottom:24px">{{ product.description|default:product.short_description }}</p>
+
+    <div class="pdp-specs-table">
+      <div class="pdp-spec-row"><span>Product Category</span><b>{{ product.category.name }}</b></div>
+      <div class="pdp-spec-row"><span>Printing Technique</span><b>High-Density Offset &amp; Digital Precision</b></div>
+      <div class="pdp-spec-row"><span>Quality Guarantee</span><b>100% Reprint / Full Refund Policy</b></div>
+      <div class="pdp-spec-row"><span>Dispatch Speed</span><b>24-48 Hours Express Dispatch</b></div>
+    </div>
+  </div>
+</section>
+
+<script>
+const pdpProductId = '{{ product.id }}';
+let pdpProductData = null;
+
+function switchMainImage(imgUrl, thumbEl) {
+  document.getElementById('pdp-main-image').src = imgUrl;
+  document.querySelectorAll('.pdp-thumb').forEach(t => t.classList.remove('active'));
+  thumbEl.classList.add('active');
+}
+
+// Fetch 100% DB-driven options & price rules on page load
+document.addEventListener('DOMContentLoaded', () => {
+  fetch(`/api/catalog/api/product/${pdpProductId}/options/`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.product) {
+        pdpProductData = data.product;
+        renderPdpDynamicOptions(data.product);
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching PDP options:', err);
+    });
+});
+
+function renderPdpDynamicOptions(product) {
+  const container = document.getElementById('pdp-dynamic-options-container');
+  container.innerHTML = '';
+
+  // 1. Quantity Tiers from DB price_rules
+  if (product.price_rules && product.price_rules.length > 0) {
+    const qtyGroup = document.createElement('div');
+    qtyGroup.className = 'pdp-option-group';
+    qtyGroup.innerHTML = '<label class="pdp-option-label">1. Select Quantity Tier (DB Driven)</label>';
+
+    const qtyGrid = document.createElement('div');
+    qtyGrid.className = 'vp-qty-grid';
+
+    product.price_rules.forEach((rule, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `vp-qty-btn ${idx === 0 ? 'active' : ''}`;
+      btn.setAttribute('data-qty', rule.qty);
+      btn.setAttribute('data-price', rule.price);
+      btn.onclick = function() { selectPdpQty(this); };
+
+      btn.innerHTML = `<b>${rule.qty.toLocaleString()}</b><span>₹${rule.price}</span>`;
+      qtyGrid.appendChild(btn);
+    });
+
+    qtyGroup.appendChild(qtyGrid);
+    container.appendChild(qtyGroup);
+  }
+
+  // 2. Options & Values from DB
+  if (product.options && product.options.length > 0) {
+    product.options.forEach((opt, optIdx) => {
+      const optGroup = document.createElement('div');
+      optGroup.className = 'pdp-option-group';
+      optGroup.innerHTML = `<label class="pdp-option-label">${optIdx + 2}. ${opt.name}</label>`;
+
+      const chipContainer = document.createElement('div');
+      chipContainer.className = 'vp-option-chips';
+
+      opt.values.forEach((val, valIdx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `vp-chip ${valIdx === 0 ? 'active' : ''}`;
+        chip.setAttribute('data-name', opt.code);
+        chip.setAttribute('data-val', val.label);
+        chip.setAttribute('data-extra', val.price_modifier);
+        chip.onclick = function() { selectPdpChip(this); };
+
+        chip.innerText = val.label;
+        chipContainer.appendChild(chip);
+      });
+
+      optGroup.appendChild(chipContainer);
+      container.appendChild(optGroup);
+    });
+  }
+
+  recalcPdpPrice();
+}
+
+function selectPdpQty(btn) {
+  btn.parentElement.querySelectorAll('.vp-qty-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalcPdpPrice();
+}
+
+function selectPdpChip(btn) {
+  btn.parentElement.querySelectorAll('.vp-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalcPdpPrice();
+}
+
+function recalcPdpPrice() {
+  const qtyBtn = document.querySelector('#pdp-dynamic-options-container .vp-qty-btn.active');
+  if (!qtyBtn) return;
+
+  const qty = parseInt(qtyBtn.getAttribute('data-qty'));
+  const basePrice = parseFloat(qtyBtn.getAttribute('data-price'));
+
+  let extra = 0;
+  document.querySelectorAll('#pdp-dynamic-options-container .vp-chip.active').forEach(chip => {
+    extra += parseFloat(chip.getAttribute('data-extra') || 0);
+  });
+
+  const total = basePrice + extra;
+  const mrp = total * 1.6;
+  const perUnit = (total / qty).toFixed(2);
+
+  document.getElementById('pdp-calc-total').innerText = total.toFixed(2);
+  document.getElementById('pdp-calc-mrp').innerText = `₹${mrp.toFixed(2)}`;
+  document.getElementById('pdp-per-unit-rate').innerText = `₹${perUnit} / unit (${qty} units total)`;
+}
+
+function checkPincode() {
+  const code = document.getElementById('pincode-input').value.trim();
+  const res = document.getElementById('pincode-result');
+  if (code.length === 6) {
+    res.innerText = `✓ Express Delivery available to Pincode ${code} by Thursday`;
+  } else {
+    res.innerText = 'Please enter a valid 6-digit Indian Pincode';
+  }
+}
+
+function submitPdpAddToCart(redirectCheckout) {
+  const cartBtn = document.getElementById('pdp-cart-btn');
+  const buyBtn = document.getElementById('pdp-buy-btn');
+  
+  cartBtn.disabled = true;
+  buyBtn.disabled = true;
+
+  if (!redirectCheckout) {
+    cartBtn.innerText = 'Adding... ⏳';
+  } else {
+    buyBtn.innerText = 'Redirecting... ⚡';
+  }
+
+  const qtyBtn = document.querySelector('#pdp-dynamic-options-container .vp-qty-btn.active');
+  const qty = qtyBtn ? parseInt(qtyBtn.getAttribute('data-qty')) : 100;
+  const priceText = document.getElementById('pdp-calc-total').innerText;
+
+  const paperChip = document.querySelector('#pdp-dynamic-options-container .vp-chip.active[data-name="paper"]');
+  const cornersChip = document.querySelector('#pdp-dynamic-options-container .vp-chip.active[data-name="corners"]');
+  const sidesChip = document.querySelector('#pdp-dynamic-options-container .vp-chip.active[data-name="sides"]');
+
+  fetch('/cart/add/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({
+      product_id: pdpProductId,
+      quantity: qty,
+      paper: paperChip ? paperChip.getAttribute('data-val') : 'Standard',
+      corners: cornersChip ? cornersChip.getAttribute('data-val') : 'Standard',
+      sides: sidesChip ? sidesChip.getAttribute('data-val') : 'Front Only',
+      total_price: priceText
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      updateCartBadge(data.cart_count);
+      if (redirectCheckout) {
+        window.location.href = '/cart/';
+      } else {
+        cartBtn.innerText = 'Added! ✓';
+        showToast(data.message);
+        setTimeout(() => {
+          cartBtn.disabled = false;
+          buyBtn.disabled = false;
+          cartBtn.innerText = 'Add to Cart 🛒';
+          buyBtn.innerText = 'Buy Now ⚡';
+        }, 600);
+      }
+    }
+  })
+  .catch(err => {
+    console.error('Error adding to cart:', err);
+    cartBtn.disabled = false;
+    buyBtn.disabled = false;
+    cartBtn.innerText = 'Add to Cart 🛒';
+    buyBtn.innerText = 'Buy Now ⚡';
+  });
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}

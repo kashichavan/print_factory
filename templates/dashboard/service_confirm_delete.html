@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Delete Service: {{ service.title }} | Owner Command Center{% endblock %}
+
+{% block content %}
+<div class="wrap dashboard">
+  <aside class="side">
+    <a href="{% url 'dashboard:service_list' %}" class="dash-nav-item">← Cancel &amp; Back to Services</a>
+  </aside>
+
+  <main class="dash-content">
+    <div class="glass-panel" style="max-width:600px;padding:40px">
+      <h1 style="font:700 32px Fraunces,serif;margin:0 0 12px;color:#991b1b">Delete Production Service?</h1>
+      <p style="margin:0 0 24px;color:var(--muted)">Are you sure you want to permanently delete <strong>"{{ service.title }}"</strong> from the database?</p>
+
+      <form method="post" style="display:flex;gap:12px">
+        {% csrf_token %}
+        <button type="submit" style="padding:12px 24px;border-radius:99px;background:#991b1b;color:#fff;border:0;font-weight:700;cursor:pointer">Confirm Permanent Delete 🗑️</button>
+        <a href="{% url 'dashboard:service_list' %}" class="button button-light">Cancel</a>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

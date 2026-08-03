@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Manage Services | Owner Command Center{% endblock %}
+
+{% block content %}
+<div class="wrap dashboard">
+  <aside class="side">
+    <p class="dash-mark">OWNER COMMAND</p>
+    <a href="{% url 'dashboard:home' %}" class="dash-nav-item">📊 Overview</a>
+    <a href="{% url 'dashboard:product_list' %}" class="dash-nav-item">📦 Products Catalogue</a>
+    <a href="{% url 'dashboard:service_list' %}" class="dash-nav-item active" style="font-weight:800;color:var(--orange)">🛠️ Production Services</a>
+    <a href="{% url 'dashboard:order_list' %}" class="dash-nav-item">🛒 Orders &amp; Proofing</a>
+    <a href="{% url 'dashboard:lead_list' %}" class="dash-nav-item">📬 Leads &amp; Enquiries</a>
+  </aside>
+
+  <main class="dash-content">
+    <div class="dash-heading">
+      <div>
+        <p class="eyebrow" style="margin:0 0 4px">DATABASE CONTROL</p>
+        <h1>Production Services</h1>
+      </div>
+      <a href="{% url 'dashboard:service_create' %}" class="nav-cta">+ Add New Service ↗</a>
+    </div>
+
+    <div class="glass-panel order-table">
+      <div class="table-row table-label" style="grid-template-columns: 80px 1.5fr 1fr 1fr 100px 120px">
+        <span>Image</span>
+        <span>Service Title &amp; Badge</span>
+        <span>Speed / Feature</span>
+        <span>Base Rate</span>
+        <span>Status</span>
+        <span>Actions</span>
+      </div>
+
+      {% for srv in services %}
+      <div class="table-row link-row" style="grid-template-columns: 80px 1.5fr 1fr 1fr 100px 120px">
+        <span>
+          <img src="{{ srv.get_image_url }}" alt="{{ srv.title }}" style="width:50px;height:40px;object-fit:cover;border-radius:8px">
+        </span>
+        <span>
+          <strong>{{ srv.title }}</strong>
+          <small>{{ srv.badge }}</small>
+        </span>
+        <span>{{ srv.speed_info }}</span>
+        <span><strong>₹{{ srv.base_rate }}</strong></span>
+        <span>
+          {% if srv.is_active %}
+            <span class="status confirmed">ACTIVE</span>
+          {% else %}
+            <span class="status cancelled">DRAFT</span>
+          {% endif %}
+        </span>
+        <span style="display:flex;gap:8px">
+          <a href="{% url 'dashboard:service_edit' srv.id %}" style="padding:4px 10px;background:#1e223010;border-radius:8px;font-size:12px;font-weight:700">Edit</a>
+          <a href="{% url 'dashboard:service_delete' srv.id %}" style="padding:4px 10px;background:#fee2e2;color:#991b1b;border-radius:8px;font-size:12px;font-weight:700">Delete</a>
+        </span>
+      </div>
+      {% empty %}
+      <div style="padding:40px;text-align:center;color:var(--muted)">
+        <p>No production services found in database.</p>
+        <a href="{% url 'dashboard:service_create' %}" class="nav-cta">+ Add First Service</a>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}

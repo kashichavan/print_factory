@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | Owner Command Center{% endblock %}
+
+{% block content %}
+<div class="wrap dashboard">
+  <aside class="side">
+    <p class="dash-mark">OWNER COMMAND</p>
+    <a href="{% url 'dashboard:service_list' %}" class="dash-nav-item">← Back to Services List</a>
+  </aside>
+
+  <main class="dash-content">
+    <div class="dash-heading">
+      <div>
+        <p class="eyebrow" style="margin:0 0 4px">DATABASE CONTROL</p>
+        <h1>{{ title }}</h1>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="dashboard-form dash-dynamic-form" style="max-width:800px;background:#ffffff;border-radius:20px;padding:35px;border:1px solid rgba(30,34,48,0.1)">
+      {% csrf_token %}
+      
+      <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:20px">
+        <label>
+          Service Title
+          {{ form.title }}
+        </label>
+        <label>
+          Badge / Tagline (e.g. 01 / DIGITAL PRINTING)
+          {{ form.badge }}
+        </label>
+      </div>
+
+      <label>
+        Short Summary
+        {{ form.summary }}
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <label>
+          Speed / Turnaround Info (e.g. Same-Day / 24hr Express)
+          {{ form.speed_info }}
+        </label>
+        <label>
+          Base Rate (₹)
+          {{ form.base_rate }}
+        </label>
+      </div>
+
+      <label>
+        Specs &amp; Offerings CSV (Comma-separated)
+        {{ form.tags_csv }}
+        <small style="color:var(--muted)">Example: Visiting Cards, Letterheads, Texture Certificates, Brochures</small>
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <label>
+          Upload Cover Image
+          {{ form.image }}
+        </label>
+        <label>
+          Display Position Order
+          {{ form.position }}
+        </label>
+      </div>
+
+      <label style="display:flex;flex-direction:row;align-items:center;gap:10px;margin-top:10px">
+        {{ form.is_active }}
+        <span>Active &amp; Visible on Storefront Services Page</span>
+      </label>
+
+      <div style="margin-top:20px;display:flex;gap:12px">
+        <button type="submit" class="nav-cta">Save Production Service ↗</button>
+        <a href="{% url 'dashboard:service_list' %}" class="button button-light">Cancel</a>
+      </div>
+    </form>
+  </main>
+</div>
+{% endblock %}

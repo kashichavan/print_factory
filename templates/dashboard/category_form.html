@@ -1,0 +1,1 @@
+{% extends 'dashboard/base.html' %}{% block dashboard_content %}<p class="eyebrow">CATALOGUE</p><h1>Add a category</h1><form method="post" class="dashboard-form">{% csrf_token %}{% for field in form %}<label>{{ field.label }}{{ field }}</label>{% endfor %}<button class="button button-dark">Save category <span>→</span></button></form>{% endblock %}

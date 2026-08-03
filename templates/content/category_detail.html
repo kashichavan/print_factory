@@ -1,0 +1,343 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}{{ category.name }} | Vistaprint Storefront | The Print Planet{% endblock %}
+
+{% block content %}
+<!-- Category Hero Banner -->
+<section class="vp-hero">
+  <div class="wrap vp-hero-inner">
+    <div class="vp-hero-copy">
+      <div class="vp-badge">{{ category.icon }} {{ category.badge|default:"VISTAPRINT QUALITY" }}</div>
+      <h1>{{ category.name }}</h1>
+      <p class="vp-hero-lead">{{ category.description }}</p>
+      
+      <div class="vp-trust-pills">
+        <span class="vp-pill">✓ 100% Satisfaction Guarantee</span>
+        <span class="vp-pill">✓ Instant Bulk Tiers</span>
+        <span class="vp-pill">✓ Custom Artwork Upload</span>
+        <span class="vp-pill">★ 4.9/5 Star Rated</span>
+      </div>
+    </div>
+    <div class="vp-hero-art">
+      {% if "packaging" in category.slug %}
+        <img src="{% static 'images/trending-packaging-perspective.jpg' %}" alt="{{ category.name }}">
+      {% elif "apparel" in category.slug %}
+        <img src="{% static 'images/vp-apparel-hero.jpg' %}" alt="{{ category.name }}">
+      {% elif "stationery" in category.slug %}
+        <img src="{% static 'images/vp-stationery-hero.jpg' %}" alt="{{ category.name }}">
+      {% elif "signage" in category.slug %}
+        <img src="{% static 'images/trending-signage-perspective.jpg' %}" alt="{{ category.name }}">
+      {% elif "gifting" in category.slug %}
+        <img src="{% static 'images/trending-gifting-perspective.jpg' %}" alt="{{ category.name }}">
+      {% else %}
+        <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="{{ category.name }}">
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Category Selector Bar -->
+<section class="wrap vp-filter-bar">
+  <div class="vp-tabs">
+    {% for cat in all_categories %}
+      <a href="{% url 'content:category_detail' cat.slug %}" class="vp-tab {% if cat.slug == category.slug %}active{% endif %}">
+        {{ cat.icon }} {{ cat.name }}
+      </a>
+    {% endfor %}
+  </div>
+  <div class="vp-filter-info">
+    <span>Showing <b>{{ products.paginator.count }} Products</b> in {{ category.name }}</span>
+  </div>
+</section>
+
+<!-- Product Catalog Grid -->
+<section class="wrap vp-catalog-grid">
+  {% for product in products %}
+  <article class="vp-product-card">
+    <a href="{% url 'content:product_detail' product.slug %}" class="vp-card-media" style="display:block">
+      <span class="vp-card-tag gold">★ {{ product.badge|default:"Bestseller" }}</span>
+      <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+    </a>
+
+    <div class="vp-card-content">
+      <h3><a href="{% url 'content:product_detail' product.slug %}" style="text-decoration:none;color:inherit">{{ product.name }}</a></h3>
+      <p>{{ product.short_description }}</p>
+
+      <div class="vp-specs-summary">
+        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>Fast Dispatch</span>
+      </div>
+
+      <div class="vp-price-row">
+        <div class="vp-price">
+          <span class="vp-from">Starting at</span>
+          <strong class="vp-amount">₹{{ product.base_price }}</strong>
+          <span class="vp-qty">per unit tier</span>
+        </div>
+        
+        <button type="button" class="vp-btn-customize" 
+                onclick="openCategoryModal(
+                  '{{ product.id }}', 
+                  '{{ product.name|escapejs }}', 
+                  '{{ product.base_price }}',
+                  '{{ product.get_image_url|escapejs }}'
+                )">
+          Customise &amp; Buy ↗
+        </button>
+      </div>
+    </div>
+  </article>
+  {% empty %}
+  <div class="empty-state">
+    <p>No products found in this category yet.</p>
+  </div>
+  {% endfor %}
+</section>
+
+<!-- Category Pagination Bar -->
+{% if products.has_other_pages %}
+<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 60px">
+  {% if products.has_previous %}
+    <a href="?page={{ products.previous_page_number }}" class="vp-tab">← Previous</a>
+  {% endif %}
+  <span style="font-size:13px;font-weight:700;color:var(--muted)">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+  {% if products.has_next %}
+    <a href="?page={{ products.next_page_number }}" class="vp-tab">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- 100% DYNAMIC DATABASE CUSTOMIZER MODAL -->
+<div id="category-modal" class="vp-modal-overlay">
+  <div class="vp-modal-box">
+    <button class="vp-modal-close" onclick="closeCategoryModal()">✕</button>
+
+    <div class="vp-modal-header">
+      <h2 id="cat-modal-name">Product Customizer</h2>
+      <p>Configure custom specifications loaded dynamically from database records.</p>
+    </div>
+
+    <div class="vp-modal-body">
+      <!-- Left Column: Media & Artwork Upload -->
+      <div class="vp-modal-preview">
+        <img id="cat-modal-img" src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Product Preview">
+
+        <div class="vp-file-upload-box">
+          <p><strong>Upload Ready Print Artwork</strong></p>
+          <small>Supported: PDF, AI, PSD, High-Res PNG (Min 300 DPI)</small>
+          <input type="file" id="cat-modal-file" class="vp-file-input" accept=".pdf,.ai,.psd,.png,.jpg">
+        </div>
+      </div>
+
+      <!-- Right Column: Dynamic DB Render Form Container -->
+      <div class="vp-modal-form" id="cat-dynamic-form-container">
+        <div style="padding:40px 0;text-align:center;color:var(--muted)">
+          <span>Loading specifications from database... ⏳</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer with Calculated Total -->
+    <div class="vp-modal-footer">
+      <div class="vp-modal-price-calc">
+        <span>Calculated Subtotal:</span>
+        <strong id="cat-modal-calc-price">₹0.00</strong>
+        <small id="cat-modal-per-unit">₹0.00 / unit</small>
+      </div>
+
+      <button type="button" id="btn-cat-add-cart" class="vp-btn-add-cart" onclick="submitCategoryAddToCart()">
+        Add to Cart 🛒
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentCatProductId = null;
+
+function openCategoryModal(id, name, basePrice, imgUrl) {
+  currentCatProductId = id;
+  
+  document.getElementById('cat-modal-name').innerText = name;
+  document.getElementById('cat-modal-img').src = imgUrl;
+  document.getElementById('category-modal').classList.add('is-open');
+  
+  const container = document.getElementById('cat-dynamic-form-container');
+  container.innerHTML = '<div style="padding:40px 0;text-align:center;color:var(--muted)"><span>Loading specifications from database... ⏳</span></div>';
+
+  fetch(`/api/catalog/api/product/${id}/options/`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.product) {
+        renderCatDynamicForm(data.product);
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching DB product options:', err);
+      container.innerHTML = '<div style="padding:20px;color:red">Failed to load options from database.</div>';
+    });
+}
+
+function renderCatDynamicForm(product) {
+  const container = document.getElementById('cat-dynamic-form-container');
+  container.innerHTML = '';
+
+  // 1. Render Dynamic Quantity Tiers from DB price_rules
+  if (product.price_rules && product.price_rules.length > 0) {
+    const qtyGroup = document.createElement('div');
+    qtyGroup.className = 'vp-form-group';
+    qtyGroup.innerHTML = '<label>1. Select Quantity Tier (DB Driven)</label>';
+
+    const qtyGrid = document.createElement('div');
+    qtyGrid.className = 'vp-qty-grid';
+
+    product.price_rules.forEach((rule, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `vp-qty-btn ${idx === 0 ? 'active' : ''}`;
+      btn.setAttribute('data-qty', rule.qty);
+      btn.setAttribute('data-price', rule.price);
+      btn.onclick = function() { selectCatQty(this); };
+
+      btn.innerHTML = `<b>${rule.qty.toLocaleString()}</b><span>₹${rule.price}</span>`;
+      qtyGrid.appendChild(btn);
+    });
+
+    qtyGroup.appendChild(qtyGrid);
+    container.appendChild(qtyGroup);
+  }
+
+  // 2. Render Dynamic Option Chips for every ProductOption & OptionValue in DB
+  if (product.options && product.options.length > 0) {
+    product.options.forEach((opt, optIdx) => {
+      const optGroup = document.createElement('div');
+      optGroup.className = 'vp-form-group';
+      optGroup.innerHTML = `<label>${optIdx + 2}. ${opt.name}</label>`;
+
+      const chipContainer = document.createElement('div');
+      chipContainer.className = 'vp-option-chips';
+
+      opt.values.forEach((val, valIdx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `vp-chip ${valIdx === 0 ? 'active' : ''}`;
+        chip.setAttribute('data-name', opt.code);
+        chip.setAttribute('data-val', val.label);
+        chip.setAttribute('data-extra', val.price_modifier);
+        chip.onclick = function() { selectCatChip(this); };
+
+        chip.innerText = val.label;
+        chipContainer.appendChild(chip);
+      });
+
+      optGroup.appendChild(chipContainer);
+      container.appendChild(optGroup);
+    });
+  }
+
+  recalculateCatPrice();
+}
+
+function closeCategoryModal() {
+  document.getElementById('category-modal').classList.remove('is-open');
+}
+
+function selectCatQty(btn) {
+  btn.parentElement.querySelectorAll('.vp-qty-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalculateCatPrice();
+}
+
+function selectCatChip(btn) {
+  btn.parentElement.querySelectorAll('.vp-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalculateCatPrice();
+}
+
+function recalculateCatPrice() {
+  const qtyBtn = document.querySelector('#cat-dynamic-form-container .vp-qty-btn.active');
+  if (!qtyBtn) return;
+
+  const qty = parseInt(qtyBtn.getAttribute('data-qty'));
+  const baseTierPrice = parseFloat(qtyBtn.getAttribute('data-price'));
+
+  let extraSum = 0;
+  document.querySelectorAll('#cat-dynamic-form-container .vp-chip.active').forEach(chip => {
+    extraSum += parseFloat(chip.getAttribute('data-extra') || 0);
+  });
+
+  const total = baseTierPrice + extraSum;
+  const perUnit = (total / qty).toFixed(2);
+
+  document.getElementById('cat-modal-calc-price').innerText = `₹${total.toFixed(2)}`;
+  document.getElementById('cat-modal-per-unit').innerText = `₹${perUnit} / unit`;
+}
+
+function submitCategoryAddToCart() {
+  if (!currentCatProductId) return;
+
+  const btn = document.getElementById('btn-cat-add-cart');
+  btn.disabled = true;
+  btn.innerText = 'Adding to Cart... ⏳';
+
+  const qtyBtn = document.querySelector('#cat-dynamic-form-container .vp-qty-btn.active');
+  const qty = qtyBtn ? parseInt(qtyBtn.getAttribute('data-qty')) : 100;
+  
+  const paperChip = document.querySelector('#cat-dynamic-form-container .vp-chip.active[data-name="paper"]');
+  const cornersChip = document.querySelector('#cat-dynamic-form-container .vp-chip.active[data-name="corners"]');
+  const sidesChip = document.querySelector('#cat-dynamic-form-container .vp-chip.active[data-name="sides"]');
+
+  const priceText = document.getElementById('cat-modal-calc-price').innerText.replace('₹', '');
+
+  const payload = {
+    product_id: currentCatProductId,
+    quantity: qty,
+    paper: paperChip ? paperChip.getAttribute('data-val') : 'Standard',
+    corners: cornersChip ? cornersChip.getAttribute('data-val') : 'Standard',
+    sides: sidesChip ? sidesChip.getAttribute('data-val') : 'Standard',
+    total_price: priceText
+  };
+
+  fetch('/cart/add/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      btn.innerText = 'Added! ✓';
+      updateCartBadge(data.cart_count);
+      showToast(data.message);
+      setTimeout(() => {
+        closeCategoryModal();
+        btn.disabled = false;
+        btn.innerText = 'Add to Cart 🛒';
+      }, 500);
+    }
+  })
+  .catch(err => {
+    console.error('Error adding to cart:', err);
+    btn.disabled = false;
+    btn.innerText = 'Add to Cart 🛒';
+    closeCategoryModal();
+  });
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}

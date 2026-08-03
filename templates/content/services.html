@@ -1,0 +1,172 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}Services &amp; Production Capabilities | The Print Planet{% endblock %}
+
+{% block content %}
+<!-- Services Hero -->
+<section class="vp-hero">
+  <div class="wrap vp-hero-inner">
+    <div class="vp-hero-copy">
+      <div class="vp-badge">✦ END-TO-END PRODUCTION</div>
+      <h1>Services &amp; Craft</h1>
+      <p class="vp-hero-lead">From high-speed digital short runs to bulk offset printing, indoor/outdoor signage, and corporate merchandise—engineered for brand perfection.</p>
+      
+      <div class="vp-trust-pills">
+        <span class="vp-pill">✓ Agile Digital &amp; Offset</span>
+        <span class="vp-pill">✓ Pantone Color Calibration</span>
+        <span class="vp-pill">✓ 24hr Express Turnaround</span>
+        <span class="vp-pill">✓ Dedicated Project Manager</span>
+      </div>
+    </div>
+    <div class="vp-hero-art">
+      <img src="{% static 'images/digital-printing.png' %}" alt="Digital &amp; Offset Printing Capabilities">
+    </div>
+  </div>
+</section>
+
+<!-- Service Filter Pills (Populated Live from DB) -->
+<section class="wrap vp-filter-bar">
+  <div class="vp-tabs">
+    {% for srv in services %}
+    <a href="#{{ srv.slug }}" class="vp-tab {% if forloop.first %}active{% endif %}">{{ srv.badge }}</a>
+    {% endfor %}
+  </div>
+  <div class="vp-filter-info">
+    <span>Instant custom pricing &amp; volume quotes available</span>
+  </div>
+</section>
+
+<!-- Dynamic Bento Grid Services Showcase (Loaded Live from Database) -->
+<section class="wrap vp-catalog-grid" style="padding-bottom:80px">
+  {% for srv in services %}
+  <article id="{{ srv.slug }}" class="vp-product-card bento-col-6">
+    <div class="vp-card-media" style="height:220px">
+      <span class="vp-card-tag gold">{{ srv.badge }}</span>
+      <img src="{{ srv.get_image_url }}" alt="{{ srv.title }}">
+    </div>
+    <div class="vp-card-content">
+      <h3>{{ srv.title }}</h3>
+      <p>{{ srv.summary }}</p>
+
+      {% if srv.tags_list %}
+      <div class="service-tags" style="margin-bottom:20px">
+        {% for tag in srv.tags_list %}
+          <span class="spec-chip">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="vp-price-row">
+        <div class="vp-price">
+          <span class="vp-from">Feature / Speed</span>
+          <strong class="vp-amount" style="font-size:18px">{{ srv.speed_info }}</strong>
+        </div>
+        <button type="button" class="vp-btn-customize" 
+                onclick="openServiceQuoteModal('{{ srv.title|escapejs }}', '{{ srv.base_rate }}', '{{ srv.get_image_url|escapejs }}')">
+          Calculate Quote ↗
+        </button>
+      </div>
+    </div>
+  </article>
+  {% empty %}
+  <div class="empty-state">
+    <p>No services registered in database.</p>
+  </div>
+  {% endfor %}
+</section>
+
+<!-- 4-Step Production Workflow -->
+<section class="services-process wrap" style="padding-top:60px;padding-bottom:100px">
+  <p class="eyebrow">SMART PRODUCTION WORKFLOW</p>
+  <h2>From initial brief<br>to final delivery.</h2>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:40px">
+    <div class="glass-panel" style="padding:24px">
+      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 01</span>
+      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">File Proofing</h3>
+      <p style="font-size:13px;color:var(--muted);margin:0">Automated preflight check on vector lines, DPI resolution, and Bleed margins.</p>
+    </div>
+
+    <div class="glass-panel" style="padding:24px">
+      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 02</span>
+      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">Color Matching</h3>
+      <p style="font-size:13px;color:var(--muted);margin:0">Pantone matching system ensures true brand color reproduction across paper stocks.</p>
+    </div>
+
+    <div class="glass-panel" style="padding:24px">
+      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 03</span>
+      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">Precision Finish</h3>
+      <p style="font-size:13px;color:var(--muted);margin:0">Computerized die-cutting, spot UV lamination, metallic foil stamping, and binding.</p>
+    </div>
+
+    <div class="glass-panel" style="padding:24px">
+      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 04</span>
+      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">Express Dispatch</h3>
+      <p style="font-size:13px;color:var(--muted);margin:0">Inspected, shrink-wrapped, and dispatched with real-time tracking across India.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Service Quote Calculator Modal -->
+<div id="service-modal" class="vp-modal-overlay">
+  <div class="vp-modal-box">
+    <button class="vp-modal-close" onclick="closeServiceModal()">✕</button>
+    <div class="vp-modal-header">
+      <h2 id="srv-modal-title">Request Service Quote</h2>
+      <p>Configure turnaround, quantity, and finishing specifications.</p>
+    </div>
+    <div class="vp-modal-body">
+      <div class="vp-modal-preview">
+        <img id="srv-modal-img" src="{% static 'images/digital-printing.png' %}" alt="Service Preview">
+      </div>
+      <div class="vp-modal-form">
+        <div class="vp-form-group">
+          <label>1. Turnaround Speed</label>
+          <div class="vp-option-chips">
+            <button type="button" class="vp-chip active" onclick="selectSrvChip(this, 0)">Standard (3-4 Days)</button>
+            <button type="button" class="vp-chip" onclick="selectSrvChip(this, 250)">Express (24 Hours) +₹250</button>
+          </div>
+        </div>
+        <div class="vp-form-group">
+          <label>2. Special Finishing</label>
+          <div class="vp-option-chips">
+            <button type="button" class="vp-chip active" onclick="selectSrvChip(this, 0)">Matte Lamination</button>
+            <button type="button" class="vp-chip" onclick="selectSrvChip(this, 150)">Spot UV Gloss (+₹150)</button>
+            <button type="button" class="vp-chip" onclick="selectSrvChip(this, 300)">Gold Foil Stamping (+₹300)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="vp-modal-footer">
+      <div class="vp-modal-price-calc">
+        <span>Estimated Rate:</span>
+        <strong id="srv-calc-price">₹490.00</strong>
+      </div>
+      <a href="{% url 'content:contact' %}" class="vp-btn-add-cart" style="text-decoration:none">Proceed to Inquiry ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+let srvBaseRate = 490;
+let srvExtra = 0;
+
+function openServiceQuoteModal(name, baseRate, imgUrl) {
+  srvBaseRate = parseFloat(baseRate || 490);
+  srvExtra = 0;
+  document.getElementById('srv-modal-title').innerText = `Quote: ${name}`;
+  document.getElementById('srv-modal-img').src = imgUrl;
+  document.getElementById('srv-calc-price').innerText = `₹${srvBaseRate.toFixed(2)}`;
+  document.getElementById('service-modal').classList.add('is-open');
+}
+function closeServiceModal() {
+  document.getElementById('service-modal').classList.remove('is-open');
+}
+function selectSrvChip(btn, extra) {
+  btn.parentElement.querySelectorAll('.vp-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  srvExtra = extra;
+  const total = srvBaseRate + srvExtra;
+  document.getElementById('srv-calc-price').innerText = `₹${total.toFixed(2)}`;
+}
+</script>
+{% endblock %}

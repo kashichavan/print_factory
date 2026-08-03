@@ -1,0 +1,192 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}Full Catalog | Vistaprint Storefront | The Print Planet{% endblock %}
+
+{% block content %}
+<section class="page-hero wrap">
+  <p class="eyebrow">VISTAPRINT CATALOGUE</p>
+  <h1>Made for your<br><em>brand.</em></h1>
+  <p class="lead">Browse our complete collection of business cards, packaging, apparel, signage, and corporate gifts.</p>
+</section>
+
+<!-- Category Filter Pills -->
+<section class="wrap vp-filter-bar">
+  <div class="vp-tabs">
+    <a href="{% url 'content:shop' %}" class="vp-tab {% if not active_category_slug %}active{% endif %}">
+      ✦ All Categories
+    </a>
+    {% for cat in categories %}
+    <a href="{% url 'content:category_detail' cat.slug %}" class="vp-tab {% if active_category_slug == cat.slug %}active{% endif %}">
+      {{ cat.icon }} {{ cat.name }}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Vistaprint Catalogue Product Grid -->
+<section class="wrap vp-catalog-grid">
+  {% for product in products %}
+  <article class="vp-product-card">
+    <a href="{% url 'content:product_detail' product.slug %}" class="vp-card-media" style="display:block">
+      <span class="vp-card-tag gold">★ {{ product.badge|default:"Bestseller" }}</span>
+      <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+    </a>
+
+    <div class="vp-card-content">
+      <div class="trending-badge" style="font-size:10px;margin-bottom:6px">{{ product.category.name }}</div>
+      <h3><a href="{% url 'content:product_detail' product.slug %}" style="text-decoration:none;color:inherit">{{ product.name }}</a></h3>
+      <p>{{ product.short_description }}</p>
+
+      <div class="vp-specs-summary">
+        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>Fast Dispatch</span>
+      </div>
+
+      <div class="vp-price-row">
+        <div class="vp-price">
+          <span class="vp-from">Starting at</span>
+          <strong class="vp-amount">₹{{ product.base_price }}</strong>
+        </div>
+        
+        <button type="button" class="vp-btn-customize" 
+                onclick="openShopModal(
+                  '{{ product.id }}', 
+                  '{{ product.name|escapejs }}', 
+                  '{{ product.base_price }}',
+                  '{% static product.get_image_url %}'
+                )">
+          Customise &amp; Buy ↗
+        </button>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+
+<!-- Storefront Pagination Bar -->
+{% if products.has_other_pages %}
+<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 60px">
+  {% if products.has_previous %}
+    <a href="?page={{ products.previous_page_number }}&amp;category={{ active_category_slug }}" class="vp-tab">← Previous</a>
+  {% endif %}
+
+  <span style="font-size:13px;font-weight:700;color:var(--ink)">
+    Page {{ products.number }} of {{ products.paginator.num_pages }}
+  </span>
+
+  {% if products.has_next %}
+    <a href="?page={{ products.next_page_number }}&amp;category={{ active_category_slug }}" class="vp-tab">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+
+<!-- Shop Modal -->
+<div id="shop-modal" class="vp-modal-overlay">
+  <div class="vp-modal-box">
+    <button class="vp-modal-close" onclick="closeShopModal()">✕</button>
+    <div class="vp-modal-header">
+      <h2 id="shop-modal-product-name">Customise Product</h2>
+      <p>Select specs and instant volume discount tier.</p>
+    </div>
+    <div class="vp-modal-body">
+      <div class="vp-modal-preview">
+        <img id="shop-modal-product-img" src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Product Preview">
+      </div>
+      <div class="vp-modal-form">
+        <div class="vp-form-group">
+          <label>1. Select Quantity</label>
+          <div class="vp-qty-grid">
+            <button type="button" class="vp-qty-btn active" data-qty="10" data-mult="1.0" onclick="selectShopQty(this)"><b>10</b><span>Sample</span></button>
+            <button type="button" class="vp-qty-btn" data-qty="50" data-mult="4.2" onclick="selectShopQty(this)"><b>50</b><span class="save-tag">Save 15%</span></button>
+            <button type="button" class="vp-qty-btn" data-qty="100" data-mult="7.5" onclick="selectShopQty(this)"><b>100</b><span class="save-tag">Save 25%</span></button>
+            <button type="button" class="vp-qty-btn" data-qty="500" data-mult="30.0" onclick="selectShopQty(this)"><b>500</b><span class="save-tag">Best Value</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="vp-modal-footer">
+      <div class="vp-modal-price-calc">
+        <span>Calculated Subtotal:</span>
+        <strong id="shop-modal-calc-price">₹190.00</strong>
+      </div>
+      <button type="button" class="vp-btn-add-cart" onclick="submitShopAddToCart()">Add to Cart 🛒</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let shopProductId = null;
+let shopBasePrice = 190;
+
+function openShopModal(id, name, basePrice, imgUrl) {
+  shopProductId = id;
+  shopBasePrice = parseFloat(basePrice);
+  document.getElementById('shop-modal-product-name').innerText = name;
+  document.getElementById('shop-modal-product-img').src = imgUrl;
+  document.getElementById('shop-modal').classList.add('is-open');
+  recalcShopPrice();
+}
+
+function closeShopModal() {
+  document.getElementById('shop-modal').classList.remove('is-open');
+}
+
+function selectShopQty(btn) {
+  btn.parentElement.querySelectorAll('.vp-qty-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalcShopPrice();
+}
+
+function recalcShopPrice() {
+  const qtyBtn = document.querySelector('#shop-modal .vp-qty-btn.active');
+  const mult = parseFloat(qtyBtn.getAttribute('data-mult'));
+  const total = shopBasePrice * mult;
+  document.getElementById('shop-modal-calc-price').innerText = `₹${total.toFixed(2)}`;
+}
+
+function submitShopAddToCart() {
+  if (!shopProductId) return;
+  const qtyBtn = document.querySelector('#shop-modal .vp-qty-btn.active');
+  const qty = parseInt(qtyBtn.getAttribute('data-qty'));
+  const priceText = document.getElementById('shop-modal-calc-price').innerText.replace('₹', '');
+
+  fetch('/cart/add/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({
+      product_id: shopProductId,
+      quantity: qty,
+      paper: 'Custom Finish',
+      corners: 'Standard',
+      sides: 'Printed',
+      total_price: priceText
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      closeShopModal();
+      updateCartBadge(data.cart_count);
+      showToast(data.message);
+    }
+  });
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}

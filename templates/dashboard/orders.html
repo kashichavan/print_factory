@@ -1,0 +1,75 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Order Operations &amp; Customer Feedback | Owner Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-heading">
+  <div>
+    <p class="eyebrow">ORDER OPERATIONS &amp; PRODUCTION</p>
+    <h1>Customer Orders &amp; Jobs</h1>
+  </div>
+</div>
+
+<div class="filters" style="margin-bottom:24px;display:flex;gap:10px;flex-wrap:wrap">
+  <a href="{% url 'dashboard:order_list' %}" class="vp-tab {% if not selected_status %}active{% endif %}">All Orders</a>
+  {% for code, label in statuses %}
+  <a href="?status={{ code }}" class="vp-tab {% if selected_status == code %}active{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="order-table glass-panel" style="padding:10px 20px;background:#ffffff">
+  <div class="table-row table-label" style="grid-template-columns:1.2fr 1.5fr 1fr 1fr 1fr">
+    <span>Order Number &amp; Date</span>
+    <span>Customer Details</span>
+    <span>Order Status</span>
+    <span>Feedback / Proofing</span>
+    <span>Manage Order</span>
+  </div>
+
+  {% for order in orders %}
+  <div class="table-row" style="grid-template-columns:1.2fr 1.5fr 1fr 1fr 1fr;align-items:center">
+    <span>
+      <b>{{ order.number }}</b>
+      <small>{{ order.created_at|date:'d M Y, H:i' }}</small>
+    </span>
+    <span>
+      <b>{{ order.customer.email|default:"Guest Buyer" }}</b>
+      <small>{{ order.customer.first_name }} {{ order.customer.last_name }}</small>
+    </span>
+    <span>
+      <i class="status {{ order.status }}">{{ order.get_status_display }}</i>
+    </span>
+    <span>
+      {% if order.status == 'delivered' %}
+        <span class="spec-chip" style="color:#059669">★ 5.0 (Approved)</span>
+      {% elif order.status == 'in_production' %}
+        <span class="spec-chip" style="color:var(--orange)">⚡ In Print Job</span>
+      {% else %}
+        <span class="spec-chip">Proof Pending</span>
+      {% endif %}
+    </span>
+    <a href="{% url 'dashboard:order_detail' order.id %}" class="button button-dark" style="padding:6px 12px;font-size:12px;border-radius:6px">Manage Order →</a>
+  </div>
+  {% empty %}
+  <div class="empty" style="padding:40px 0;text-align:center">
+    <p>No customer orders found matching selected filter.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination Controls -->
+{% if orders.has_other_pages %}
+<div class="vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px">
+  {% if orders.has_previous %}
+    <a href="?page={{ orders.previous_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">← Previous</a>
+  {% endif %}
+
+  <span style="font-size:13px;font-weight:700;color:var(--ink)">
+    Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+  </span>
+
+  {% if orders.has_next %}
+    <a href="?page={{ orders.next_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

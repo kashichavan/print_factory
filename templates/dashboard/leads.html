@@ -1,0 +1,127 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Lead Enquiries &amp; Staff Attribution | Owner Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-heading">
+  <div>
+    <p class="eyebrow">STAFF ATTRIBUTION &amp; SALES PIPELINE</p>
+    <h1>Customer Enquiries &amp; Quotes</h1>
+  </div>
+</div>
+
+<!-- Status Filter Tabs -->
+<div class="filters" style="margin-bottom:24px;display:flex;gap:10px;flex-wrap:wrap">
+  <a href="{% url 'dashboard:lead_list' %}" class="vp-tab {% if not selected_status %}active{% endif %}">All Enquiries</a>
+  {% for code, label in status_choices %}
+  <a href="?status={{ code }}" class="vp-tab {% if selected_status == code %}active{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<!-- Leads Table with Staff Attribution -->
+<div class="order-table glass-panel" style="padding:10px 20px;background:#ffffff">
+  <div class="table-row table-label" style="grid-template-columns:1.2fr 1fr 1.5fr 1fr 1fr 1.2fr">
+    <span>Contact Name &amp; Email</span>
+    <span>Phone</span>
+    <span>Requirement Message</span>
+    <span>Status Reason</span>
+    <span>Updated By Staff</span>
+    <span>Update Status</span>
+  </div>
+
+  {% for lead in leads %}
+  <div class="table-row" style="grid-template-columns:1.2fr 1fr 1.5fr 1fr 1fr 1.2fr;align-items:center">
+    <span>
+      <b>{{ lead.name }}</b>
+      <small>{{ lead.email }}</small>
+    </span>
+    <span>{{ lead.phone|default:"Not provided" }}</span>
+    <span><small>{{ lead.message|truncatewords:10 }}</small></span>
+    <span>
+      <small style="color:var(--muted)">{{ lead.status_reason|default:"No reason logged" }}</small>
+    </span>
+    <span>
+      {% if lead.updated_by %}
+        <b>{{ lead.updated_by.email|truncatechars:18 }}</b>
+        <small>{{ lead.updated_at|date:'d M, H:i' }}</small>
+      {% else %}
+        <small style="color:var(--muted)">Unassigned</small>
+      {% endif %}
+    </span>
+    <span>
+      <button type="button" class="button button-dark" style="padding:6px 12px;font-size:12px;border-radius:6px"
+              onclick="openLeadModal('{{ lead.id }}', '{{ lead.name|escapejs }}', '{{ lead.status }}', '{{ lead.status_reason|escapejs }}')">
+        Update ✏️
+      </button>
+    </span>
+  </div>
+  {% empty %}
+  <div class="empty" style="padding:40px 0;text-align:center">
+    <p>No customer enquiries found matching selected status filter.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination Controls -->
+{% if leads.has_other_pages %}
+<div class="vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px">
+  {% if leads.has_previous %}
+    <a href="?page={{ leads.previous_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">← Previous</a>
+  {% endif %}
+
+  <span style="font-size:13px;font-weight:700;color:var(--ink)">
+    Page {{ leads.number }} of {{ leads.paginator.num_pages }}
+  </span>
+
+  {% if leads.has_next %}
+    <a href="?page={{ leads.next_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Lead Update Modal with Staff Reason & Notes -->
+<div id="lead-modal" class="vp-modal-overlay">
+  <div class="vp-modal-box" style="max-width:500px">
+    <button class="vp-modal-close" onclick="closeLeadModal()">✕</button>
+    <div class="vp-modal-header">
+      <h2 id="lead-modal-title">Update Lead Status</h2>
+      <p>Attributed to staff user: <b>{{ request.user.email }}</b></p>
+    </div>
+    <form id="lead-update-form" method="post" class="dash-dynamic-form" style="padding:24px">
+      {% csrf_token %}
+      <label>
+        <b>Pipeline Status</b>
+        <select name="status" id="lead-modal-status">
+          {% for code, label in status_choices %}
+            <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>
+        <b>Status Reason / Summary</b>
+        <input type="text" name="status_reason" id="lead-modal-reason" placeholder="e.g. Sent formal quotation for 500 mailer boxes @ ₹45/pc">
+      </label>
+
+      <label>
+        <b>Internal Staff Note</b>
+        <textarea name="note" rows="3" placeholder="Add follow-up notes for the team..."></textarea>
+      </label>
+
+      <button type="submit" class="button button-dark" style="width:100%;margin-top:16px;justify-content:center">Save &amp; Attribute to Me ↗</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function openLeadModal(id, name, status, reason) {
+  document.getElementById('lead-modal-title').innerText = `Update Enquiry: ${name}`;
+  document.getElementById('lead-modal-status').value = status;
+  document.getElementById('lead-modal-reason').value = reason || '';
+  document.getElementById('lead-update-form').action = `/owner/leads/${id}/update/`;
+  document.getElementById('lead-modal').classList.add('is-open');
+}
+function closeLeadModal() {
+  document.getElementById('lead-modal').classList.remove('is-open');
+}
+</script>
+{% endblock %}
