@@ -218,7 +218,8 @@ function renderCatDynamicForm(product) {
       btn.setAttribute('data-price', rule.price);
       btn.onclick = function() { selectCatQty(this); };
 
-      btn.innerHTML = `<b>${rule.qty.toLocaleString()}</b><span>₹${rule.price}</span>`;
+      const unitPrice = (parseFloat(rule.price) / parseInt(rule.qty)).toFixed(2);
+      btn.innerHTML = `<b>${rule.qty.toLocaleString()} Units</b><span class="save-tag">₹${unitPrice}/pc</span>`;
       qtyGrid.appendChild(btn);
     });
 

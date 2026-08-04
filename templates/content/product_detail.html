@@ -164,7 +164,8 @@ function renderPdpDynamicOptions(product) {
       btn.setAttribute('data-price', rule.price);
       btn.onclick = function() { selectPdpQty(this); };
 
-      btn.innerHTML = `<b>${rule.qty.toLocaleString()}</b><span>₹${rule.price}</span>`;
+      const unitPrice = (parseFloat(rule.price) / parseInt(rule.qty)).toFixed(2);
+      btn.innerHTML = `<b>${rule.qty.toLocaleString()} Units</b><span class="save-tag">₹${unitPrice}/pc</span>`;
       qtyGrid.appendChild(btn);
     });
 
