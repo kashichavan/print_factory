@@ -115,9 +115,15 @@ CACHES = {
 LOGIN_URL = "/owner/login/"
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://*",
+    "http://*",
     "https://*.onrender.com",
     "http://*.onrender.com",
     "http://127.0.0.1:8000",
     "http://localhost:8000",
 ]
+
+if os.environ.get("CSRF_TRUSTED_ORIGINS"):
+    custom_origins = [origin.strip() for origin in os.environ["CSRF_TRUSTED_ORIGINS"].split(",") if origin.strip()]
+    CSRF_TRUSTED_ORIGINS.extend(custom_origins)
 
