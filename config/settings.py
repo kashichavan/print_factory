@@ -44,7 +44,19 @@ TEMPLATES = [{
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-if os.environ.get("DB_ENGINE"):
+if os.environ.get("DATABASE_URL"):
+    try:
+        import dj_database_url
+        DATABASES = {
+            "default": dj_database_url.config(
+                default=os.environ["DATABASE_URL"],
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    except Exception:
+        DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+elif os.environ.get("DB_ENGINE"):
     DATABASES = {"default": {
         "ENGINE": os.environ["DB_ENGINE"],
         "NAME": os.environ["DB_NAME"],
