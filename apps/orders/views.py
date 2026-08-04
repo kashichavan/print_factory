@@ -5,7 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from apps.catalog.models import Product, ProductVariant
-from .models import Cart, CartItem
+import time
+from .models import Cart, CartItem, Order, OrderItem
 
 def _get_cart(request):
     if not request.session.session_key:
@@ -18,6 +19,73 @@ def _get_cart(request):
     else:
         cart, _ = Cart.objects.get_or_create(session_key=session_key, is_active=True)
     return cart
+
+@csrf_exempt
+@require_POST
+def checkout(request):
+    try:
+        cart = _get_cart(request)
+        cart_items = cart.items.select_related("product", "variant").all()
+        
+        if not cart_items.exists():
+            return JsonResponse({"success": False, "message": "Your cart is empty. Please add products before checking out."}, status=400)
+
+        customer_name = request.POST.get("customer_name", "").strip()
+        customer_email = request.POST.get("customer_email", "").strip()
+        customer_phone = request.POST.get("customer_phone", "").strip()
+        notes = request.POST.get("notes", "").strip()
+
+        if not customer_name or not customer_email or not customer_phone:
+            return JsonResponse({"success": False, "message": "Please fill in your Name, Email, and Mobile Phone Number."}, status=400)
+
+        subtotal = Decimal("0.00")
+        for item in cart_items:
+            tot = Decimal(item.specifications.get("total_price", "0.00"))
+            subtotal += tot
+
+        tax = round(subtotal * Decimal("0.18"), 2)
+        shipping = Decimal("0.00") if (subtotal >= Decimal("999.00") or subtotal == Decimal("0.00")) else Decimal("99.00")
+
+        order_number = f"ORD-{int(time.time())}"
+        artwork_file = request.FILES.get("artwork_file")
+
+        user = request.user if request.user.is_authenticated else None
+        order = Order.objects.create(
+            number=order_number,
+            customer=user,
+            customer_name=customer_name,
+            customer_email=customer_email,
+            customer_phone=customer_phone,
+            artwork_file=artwork_file,
+            subtotal=subtotal,
+            tax_amount=tax,
+            shipping_amount=shipping,
+            notes=notes,
+            status=Order.Status.PENDING,
+        )
+
+        for item in cart_items:
+            unit_p = Decimal(item.specifications.get("unit_price", "0.00"))
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                variant=item.variant,
+                product_name=item.product.name,
+                sku=item.variant.sku if item.variant else "",
+                quantity=item.quantity,
+                specifications=item.specifications,
+                unit_price=unit_p,
+            )
+
+        cart.items.all().delete()
+
+        return JsonResponse({
+            "success": True,
+            "order_number": order.number,
+            "message": f"Order #{order.number} placed successfully! It has been automatically sent to the owner."
+        })
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=400)
 
 @csrf_exempt
 @require_POST

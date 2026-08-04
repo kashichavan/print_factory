@@ -18,3 +18,29 @@ class OrderModelTests(TestCase):
         self.assertEqual(order.items.get(), item)
         self.assertEqual(payment.order, order)
         self.assertEqual(shipment.order, order)
+
+    def test_checkout_collects_user_info_and_creates_order_for_owner(self):
+        category = Category.objects.create(name="Business Cards", slug="business-cards")
+        product = Product.objects.create(name="Standard Card", slug="standard-card", category=category, base_price="190.00")
+        
+        # Add to cart
+        self.client.post("/cart/add/", data={"product_id": str(product.id), "quantity": 100, "total_price": "190.00"}, content_type="application/json")
+        
+        # Perform checkout
+        response = self.client.post("/cart/checkout/", data={
+            "customer_name": "Test Owner Order",
+            "customer_email": "ownerorder@example.com",
+            "customer_phone": "+91 9876543210",
+            "notes": "Express delivery requested"
+        })
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        
+        order = Order.objects.get(number=data["order_number"])
+        self.assertEqual(order.customer_name, "Test Owner Order")
+        self.assertEqual(order.customer_email, "ownerorder@example.com")
+        self.assertEqual(order.customer_phone, "+91 9876543210")
+        self.assertEqual(order.items.count(), 1)
+

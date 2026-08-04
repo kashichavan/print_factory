@@ -31,7 +31,8 @@
       <thead>
         <tr style="background:#eff6ff;border-bottom:1px solid #dbeafe;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:#64748b">
           <th style="padding:14px 18px">Order Number &amp; Date</th>
-          <th style="padding:14px 18px">Customer Email</th>
+          <th style="padding:14px 18px">Customer Info</th>
+          <th style="padding:14px 18px">Uploaded Image</th>
           <th style="padding:14px 18px">Status</th>
           <th style="padding:14px 18px;text-align:right">Action</th>
         </tr>
@@ -44,7 +45,20 @@
             <small style="color:#64748b;font-size:11px">{{ order.created_at|date:'d M Y, H:i' }}</small>
           </td>
           <td style="padding:14px 18px;font-size:13px;color:#0f172a;font-weight:600">
-            {{ order.customer.email|default:"Guest Buyer" }}
+            <div>{{ order.customer_name|default:order.customer.get_full_name|default:"Guest Buyer" }}</div>
+            <small style="color:#475569;display:block">✉ {{ order.customer_email|default:order.customer.email }}</small>
+            {% if order.customer_phone %}
+              <small style="color:#2563eb;display:block;font-weight:700">📞 {{ order.customer_phone }}</small>
+            {% endif %}
+          </td>
+          <td style="padding:14px 18px">
+            {% if order.artwork_file %}
+              <a href="{{ order.artwork_file.url }}" target="_blank" title="Click to view full image">
+                <img src="{{ order.artwork_file.url }}" alt="Uploaded Artwork" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1">
+              </a>
+            {% else %}
+              <span style="font-size:11px;color:#94a3b8">No image</span>
+            {% endif %}
           </td>
           <td style="padding:14px 18px">
             <span class="status {{ order.status }}" style="font-size:11px;font-weight:700">
@@ -57,7 +71,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4" style="padding:30px;text-align:center;color:#64748b">
+          <td colspan="5" style="padding:30px;text-align:center;color:#64748b">
             No recent orders found. New checkout orders will automatically populate here.
           </td>
         </tr>

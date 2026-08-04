@@ -22,17 +22,26 @@ class CartItem(TimeStampedUUIDModel):
 class Order(TimeStampedUUIDModel):
     class Status(models.TextChoices): PENDING = "pending", "Pending"; CONFIRMED = "confirmed", "Confirmed"; IN_PRODUCTION = "production", "In production"; SHIPPED = "shipped", "Shipped"; DELIVERED = "delivered", "Delivered"; CANCELLED = "cancelled", "Cancelled"
     number = models.CharField(max_length=30, unique=True)
-    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="orders")
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="orders")
+    customer_name = models.CharField(max_length=255, blank=True)
+    customer_email = models.CharField(max_length=255, blank=True)
+    customer_phone = models.CharField(max_length=50, blank=True)
+    artwork_file = models.FileField(upload_to="order_artworks/", blank=True, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, blank=True, related_name="orders")
     quote_request = models.OneToOneField(QuoteRequest, on_delete=models.SET_NULL, null=True, blank=True, related_name="order")
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
-    billing_address = models.ForeignKey(Address, on_delete=models.PROTECT, related_name="billing_orders")
-    shipping_address = models.ForeignKey(Address, on_delete=models.PROTECT, related_name="shipping_orders")
+    billing_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name="billing_orders")
+    shipping_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name="shipping_orders")
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     shipping_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     notes = models.TextField(blank=True)
+
+    @property
+    def total_amount(self):
+        return self.subtotal + self.tax_amount + self.shipping_amount - self.discount_amount
+
     class Meta: indexes = [models.Index(fields=["status", "created_at"]), models.Index(fields=["customer", "created_at"])]
 
 class OrderItem(TimeStampedUUIDModel):
@@ -46,6 +55,10 @@ class OrderItem(TimeStampedUUIDModel):
     unit_price = models.DecimalField(max_digits=12, decimal_places=2)
     setup_charge = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("0.00"))
+
+    @property
+    def total_price(self):
+        return round(self.unit_price * self.quantity, 2)
 
 class Payment(TimeStampedUUIDModel):
     class Status(models.TextChoices): PENDING = "pending", "Pending"; AUTHORIZED = "authorized", "Authorized"; PAID = "paid", "Paid"; FAILED = "failed", "Failed"; REFUNDED = "refunded", "Refunded"

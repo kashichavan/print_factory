@@ -87,7 +87,7 @@
           <strong>₹{{ grand_total }}</strong>
         </div>
 
-        <button type="button" class="button button-dark cart-checkout-btn" onclick="alert('Order placed successfully! In a live environment, this connects to Razorpay/Stripe checkout.')">
+        <button type="button" class="button button-dark cart-checkout-btn" onclick="openCheckoutModal()">
           Proceed to Checkout ↗
         </button>
 
@@ -98,6 +98,114 @@
       </div>
     </div>
   </div>
+
+  <!-- CHECKOUT USER INFO MODAL -->
+  <div id="checkout-modal" class="vp-modal-overlay">
+    <div class="vp-modal-box" style="max-width:550px">
+      <button type="button" class="vp-modal-close" onclick="closeCheckoutModal()">✕</button>
+
+      <div id="checkout-form-container">
+        <div class="vp-modal-header" style="text-align:left;border-bottom:1px solid #e2e8f0;padding-bottom:16px;margin-bottom:20px">
+          <h2 style="font:700 24px 'Plus Jakarta Sans', sans-serif;color:#0f172a;margin:0 0 6px">Complete Your Order</h2>
+          <p style="font-size:13px;color:#64748b;margin:0">Enter your contact info so the owner receives your order automatically.</p>
+        </div>
+
+        <form id="checkout-form" onsubmit="submitCheckoutForm(event)" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:4px">Full Name <span style="color:#ef4444">*</span></label>
+              <input type="text" name="customer_name" required placeholder="e.g. Rahul Sharma" style="width:100%;padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;box-sizing:border-box">
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:4px">Email Address <span style="color:#ef4444">*</span></label>
+                <input type="email" name="customer_email" required placeholder="e.g. rahul@example.com" style="width:100%;padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;box-sizing:border-box">
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:4px">Mobile Number <span style="color:#ef4444">*</span></label>
+                <input type="tel" name="customer_phone" required placeholder="e.g. 9876543210" style="width:100%;padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;box-sizing:border-box">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:4px">Upload Custom Artwork / Image File (Optional)</label>
+              <input type="file" name="artwork_file" accept="image/*,.pdf,.ai,.psd" style="width:100%;padding:8px;border:1px dashed #cbd5e1;border-radius:8px;background:#f8fafc;font-size:12px;box-sizing:border-box">
+            </div>
+
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:4px">Delivery Address &amp; Instructions</label>
+              <textarea name="notes" rows="2" placeholder="e.g. Flat 402, Sunshine Apartments, MG Road, Bengaluru" style="width:100%;padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;box-sizing:border-box"></textarea>
+            </div>
+
+            <div style="background:#f1f5f9;padding:12px 16px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+              <span style="font-size:13px;font-weight:600;color:#475569">Total Payable Amount:</span>
+              <strong style="font-size:18px;color:#0f172a">₹{{ grand_total }}</strong>
+            </div>
+
+            <button type="submit" id="btn-submit-order" class="button button-dark" style="width:100%;padding:14px;border-radius:8px;background:#2563eb;font-size:15px;font-weight:700;margin-top:6px;justify-content:center">
+              Submit Order to Owner 🚀
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div id="checkout-success-container" style="display:none;text-align:center;padding:20px 0">
+        <div style="font-size:48px;margin-bottom:12px">🎉</div>
+        <h2 style="font:700 24px 'Plus Jakarta Sans', sans-serif;color:#0f172a;margin:0 0 8px">Order Placed Successfully!</h2>
+        <p style="font-size:14px;color:#475569;margin-bottom:16px">Your Order Number is <strong id="placed-order-number" style="color:#2563eb">ORD-XXXXX</strong>.</p>
+        <p style="font-size:13px;color:#64748b;margin-bottom:24px">Your order has automatically been sent to the store owner dashboard.</p>
+        <a href="{% url 'content:shop' %}" class="button button-dark" style="background:#2563eb;padding:10px 20px;border-radius:8px">Continue Shopping 🛍</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function openCheckoutModal() {
+    document.getElementById('checkout-modal').classList.add('is-open');
+  }
+
+  function closeCheckoutModal() {
+    document.getElementById('checkout-modal').classList.remove('is-open');
+  }
+
+  function submitCheckoutForm(e) {
+    e.preventDefault();
+    const form = document.getElementById('checkout-form');
+    const formData = new FormData(form);
+    const btn = document.getElementById('btn-submit-order');
+    
+    btn.disabled = true;
+    btn.innerText = 'Submitting Order to Owner... ⏳';
+
+    fetch("{% url 'orders:checkout' %}", {
+      method: 'POST',
+      body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('checkout-form-container').style.display = 'none';
+        document.getElementById('checkout-success-container').style.display = 'block';
+        document.getElementById('placed-order-number').innerText = data.order_number;
+        if (typeof updateCartBadge === 'function') {
+          updateCartBadge(0);
+        }
+      } else {
+        alert(data.message || 'Failed to place order.');
+        btn.disabled = false;
+        btn.innerText = 'Submit Order to Owner 🚀';
+      }
+    })
+    .catch(err => {
+      console.error('Checkout error:', err);
+      alert('Something went wrong placing your order.');
+      btn.disabled = false;
+      btn.innerText = 'Submit Order to Owner 🚀';
+    });
+  }
+  </script>
   {% else %}
   <div class="cart-empty-state">
     <div class="empty-icon">🛒</div>

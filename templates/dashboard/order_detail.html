@@ -46,23 +46,48 @@
       </div>
     </div>
 
-    <!-- Customer Artwork Approval Card -->
-    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
-      <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Customer Artwork Approval</h2>
+    <!-- Customer Information Card -->
+    <div class="glass-panel" style="padding:24px;background:#ffffff;margin-bottom:24px;border-radius:14px;border:1px solid #e2e8f0">
+      <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Customer Information</h2>
       <div class="pdp-specs-table">
         <div class="pdp-spec-row">
-          <span>Artwork Proof Status</span>
-          <b style="color:#2563eb">Approved by Customer</b>
+          <span>Customer Name</span>
+          <b style="color:#0f172a">{{ order.customer_name|default:order.customer.get_full_name|default:"Guest Customer" }}</b>
         </div>
         <div class="pdp-spec-row">
-          <span>Production Job Number</span>
-          <b>JOB-{{ order.number }}</b>
+          <span>Email Address</span>
+          <b style="color:#2563eb">✉ {{ order.customer_email|default:order.customer.email|default:"N/A" }}</b>
         </div>
         <div class="pdp-spec-row">
-          <span>Customer Delivery Notes</span>
-          <b>{{ order.notes|default:"Standard Safe Packaging" }}</b>
+          <span>Mobile Phone Number</span>
+          <b style="color:#059669">📞 {{ order.customer_phone|default:"N/A" }}</b>
+        </div>
+        <div class="pdp-spec-row">
+          <span>Delivery Address &amp; Instructions</span>
+          <b>{{ order.notes|default:"No special delivery instructions provided" }}</b>
         </div>
       </div>
+    </div>
+
+    <!-- Customer Uploaded Image / Artwork Card -->
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Uploaded Artwork &amp; Design Image</h2>
+      {% if order.artwork_file %}
+        <div style="background:#f8fafc;padding:16px;border-radius:10px;border:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+          <a href="{{ order.artwork_file.url }}" target="_blank" title="Click to view full image">
+            <img src="{{ order.artwork_file.url }}" alt="Customer Uploaded Artwork" style="max-width:320px;max-height:220px;object-fit:contain;border-radius:8px;border:1px solid #cbd5e1;box-shadow:0 2px 8px rgba(0,0,0,0.08);background:#ffffff;padding:4px">
+          </a>
+          <div style="display:flex;gap:10px">
+            <a href="{{ order.artwork_file.url }}" target="_blank" class="button button-dark" style="padding:8px 16px;font-size:13px;border-radius:6px;background:#2563eb">
+              View / Download Full Image ↗
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <div style="background:#f8fafc;padding:20px;border-radius:10px;border:1px dashed #cbd5e1;text-align:center">
+          <p style="color:#64748b;margin:0;font-size:14px">📷 No custom artwork image was uploaded during checkout for this order.</p>
+        </div>
+      {% endif %}
     </div>
   </div>
 
