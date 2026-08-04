@@ -43,9 +43,6 @@
 
       <!-- Right Action Cluster -->
       <div style="display:flex;align-items:center;gap:12px">
-        <a href="{% url 'dashboard:home' %}" class="nav-cart-link" style="font-weight:600">
-          Owner Hub
-        </a>
         <a href="{% url 'orders:cart_detail' %}" class="nav-cart-link">
           Cart <span id="cart-badge" class="cart-count-pill">0</span>
         </a>
@@ -84,7 +81,6 @@
           <a href="{% url 'content:services' %}" class="drawer-link" onclick="closeSidebarDrawer()">Production Services</a>
           <a href="{% url 'orders:cart_detail' %}" class="drawer-link" onclick="closeSidebarDrawer()">View Cart</a>
           <a href="{% url 'content:contact' %}" class="drawer-link" onclick="closeSidebarDrawer()">Request Custom Quote</a>
-          <a href="{% url 'dashboard:home' %}" class="drawer-link" onclick="closeSidebarDrawer()">Owner Control Center</a>
         </nav>
       </div>
 
