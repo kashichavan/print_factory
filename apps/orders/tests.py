@@ -20,8 +20,8 @@ class OrderModelTests(TestCase):
         self.assertEqual(shipment.order, order)
 
     def test_checkout_collects_user_info_and_creates_order_for_owner(self):
-        category = Category.objects.create(name="Business Cards", slug="business-cards")
-        product = Product.objects.create(name="Standard Card", slug="standard-card", category=category, base_price="190.00")
+        category, _ = Category.objects.get_or_create(slug="business-cards-test", defaults={"name": "Business Cards Test"})
+        product, _ = Product.objects.get_or_create(slug="standard-card-test", defaults={"name": "Standard Card Test", "category": category, "base_price": "190.00"})
         
         # Add to cart
         self.client.post("/cart/add/", data={"product_id": str(product.id), "quantity": 100, "total_price": "190.00"}, content_type="application/json")
