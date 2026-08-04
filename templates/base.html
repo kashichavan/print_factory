@@ -11,7 +11,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
@@ -21,7 +21,7 @@
     <button type="button" class="flash-close" onclick="dismissFlashBanner()">✕</button>
   </div>
 
-  <!-- Enterprise SaaS Header Navigation -->
+  <!-- Enterprise SaaS Header Navigation (Desktop Browser Viewport) -->
   <header class="site-header">
     <div class="nav wrap">
       <!-- Left Brand & Categories Drawer Trigger -->
@@ -36,7 +36,6 @@
       <!-- Center Primary Navigation -->
       <nav class="nav-links" id="main-nav-links">
         <a href="{% url 'content:shop' %}" class="{% if request.resolver_match.url_name == 'shop' %}active{% endif %}">Shop Catalog</a>
-        <a href="{% url 'content:services' %}" class="{% if request.resolver_match.url_name == 'services' %}active{% endif %}">Services</a>
         <a href="{% url 'content:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About Us</a>
         <a href="{% url 'content:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
       </nav>
@@ -78,7 +77,6 @@
         <div class="drawer-section-title" style="margin-top:28px">Quick Navigation</div>
         <nav class="drawer-nav">
           <a href="{% url 'content:shop' %}" class="drawer-link" onclick="closeSidebarDrawer()">Full Shop Catalog</a>
-          <a href="{% url 'content:services' %}" class="drawer-link" onclick="closeSidebarDrawer()">Production Services</a>
           <a href="{% url 'content:about' %}" class="drawer-link" onclick="closeSidebarDrawer()">About Us</a>
           <a href="{% url 'orders:cart_detail' %}" class="drawer-link" onclick="closeSidebarDrawer()">View Cart</a>
           <a href="{% url 'content:contact' %}" class="drawer-link" onclick="closeSidebarDrawer()">Request Custom Quote</a>
@@ -103,6 +101,22 @@
     <span>Need Custom Print Help?</span>
   </div>
 
+  <!-- Mobile Bottom Navigation Bar (Visible on Mobile Devices <= 768px) -->
+  <nav class="mobile-bottom-nav">
+    <a href="{% url 'content:home' %}" class="m-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <span>Home</span>
+    </a>
+    <a href="{% url 'content:shop' %}" class="m-nav-item {% if request.resolver_match.url_name == 'shop' %}active{% endif %}">
+      <span>Shop</span>
+    </a>
+    <button type="button" class="m-nav-item" onclick="toggleSidebarDrawer()" style="background:none;border:0;cursor:pointer;padding:0">
+      <span>Categories</span>
+    </button>
+    <a href="{% url 'orders:cart_detail' %}" class="m-nav-item {% if request.resolver_match.url_name == 'cart_detail' %}active{% endif %}">
+      <span>Cart</span>
+    </a>
+  </nav>
+
   {% if messages %}
   <div class="messages wrap">
     {% for message in messages %}
@@ -125,7 +139,6 @@
       </div>
       <div>
         <a href="{% url 'content:about' %}">About Us</a>
-        <a href="{% url 'content:services' %}">Services</a>
         <a href="{% url 'content:shop' %}">Shop Catalog</a>
         <a href="{% url 'content:contact' %}">Contact Us</a>
       </div>
