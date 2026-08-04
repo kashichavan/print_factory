@@ -15,6 +15,9 @@ class Category(PublishableModel):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Categories"
+        indexes = [
+            models.Index(fields=["is_active", "slug"]),
+        ]
 
     def __str__(self):
         return self.name
@@ -40,8 +43,10 @@ class Product(PublishableModel):
 
     class Meta:
         indexes = [
-            models.Index(fields=["is_active", "category"]),
+            models.Index(fields=["is_active", "category", "created_at"]),
+            models.Index(fields=["slug"]),
             models.Index(fields=["product_type"]),
+            models.Index(fields=["is_active", "created_at"]),
         ]
 
     def __str__(self):
