@@ -278,22 +278,25 @@ function submitAddToCart() {
 
   const priceText = document.getElementById('modal-calc-price').innerText.replace('₹', '');
 
-  const payload = {
-    product_id: currentProductId,
-    quantity: qty,
-    paper: paperChip ? paperChip.getAttribute('data-val') : 'Standard Matte (300gsm)',
-    corners: cornersChip ? cornersChip.getAttribute('data-val') : 'Square',
-    sides: sidesChip ? sidesChip.getAttribute('data-val') : 'Front Only',
-    total_price: priceText
-  };
+  const formData = new FormData();
+  formData.append('product_id', currentProductId);
+  formData.append('quantity', qty);
+  formData.append('paper', paperChip ? paperChip.getAttribute('data-val') : 'Standard Matte (300gsm)');
+  formData.append('corners', cornersChip ? cornersChip.getAttribute('data-val') : 'Square');
+  formData.append('sides', sidesChip ? sidesChip.getAttribute('data-val') : 'Front Only');
+  formData.append('total_price', priceText);
+
+  const fileInput = document.getElementById('modal-file-input');
+  if (fileInput && fileInput.files[0]) {
+    formData.append('artwork_file', fileInput.files[0]);
+  }
 
   fetch('/cart/add/', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       'X-CSRFToken': getCookie('csrftoken')
     },
-    body: JSON.stringify(payload)
+    body: formData
   })
   .then(res => res.json())
   .then(data => {

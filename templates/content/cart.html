@@ -40,6 +40,9 @@
           {% if item.specifications.sides %}
             <span class="spec-chip">🖨 {{ item.specifications.sides }}</span>
           {% endif %}
+          {% if item.specifications.artwork_url %}
+            <span class="spec-chip" style="background:#dbeafe;color:#1d4ed8;font-weight:700">🖼 Custom Artwork Attached</span>
+          {% endif %}
         </div>
 
         <div class="cart-item-foot">
@@ -137,11 +140,6 @@
                 <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">Mobile Number <span style="color:#ef4444">*</span></label>
                 <input type="tel" name="customer_phone" required placeholder="e.g. 9876543210" style="width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:14px;box-sizing:border-box;background:#f8fafc;">
               </div>
-            </div>
-
-            <div>
-              <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">Upload Custom Artwork / Image File (Optional)</label>
-              <input type="file" name="artwork_file" accept="image/*,.pdf,.ai,.psd" style="width:100%;padding:10px;border:1px dashed #cbd5e1;border-radius:10px;background:#f8fafc;font-size:13px;box-sizing:border-box;">
             </div>
 
             <div>

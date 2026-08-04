@@ -93,8 +93,8 @@
     <!-- Artwork Upload Box -->
     <div class="vp-file-upload-box" style="margin-bottom:24px">
       <p><b>Upload Custom Logo / Artwork File</b></p>
-      <small>Supported Formats: PDF, AI, PSD, SVG, PNG (Max 50MB)</small>
-      <input type="file" class="vp-file-input">
+      <small>Supported Formats: PDF, AI, PSD, SVG, PNG, JPG (Max 50MB)</small>
+      <input type="file" id="pdp-file-input" class="vp-file-input" accept="image/*,.pdf,.ai,.psd">
     </div>
 
     <!-- Dual Action CTA Buttons -->
@@ -267,20 +267,25 @@ function submitPdpAddToCart(redirectCheckout) {
   const cornersChip = document.querySelector('#pdp-dynamic-options-container .vp-chip.active[data-name="corners"]');
   const sidesChip = document.querySelector('#pdp-dynamic-options-container .vp-chip.active[data-name="sides"]');
 
+  const formData = new FormData();
+  formData.append('product_id', pdpProductId);
+  formData.append('quantity', qty);
+  formData.append('paper', paperChip ? paperChip.getAttribute('data-val') : 'Standard');
+  formData.append('corners', cornersChip ? cornersChip.getAttribute('data-val') : 'Standard');
+  formData.append('sides', sidesChip ? sidesChip.getAttribute('data-val') : 'Front Only');
+  formData.append('total_price', priceText);
+
+  const fileInput = document.getElementById('pdp-file-input');
+  if (fileInput && fileInput.files[0]) {
+    formData.append('artwork_file', fileInput.files[0]);
+  }
+
   fetch('/cart/add/', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       'X-CSRFToken': getCookie('csrftoken')
     },
-    body: JSON.stringify({
-      product_id: pdpProductId,
-      quantity: qty,
-      paper: paperChip ? paperChip.getAttribute('data-val') : 'Standard',
-      corners: cornersChip ? cornersChip.getAttribute('data-val') : 'Standard',
-      sides: sidesChip ? sidesChip.getAttribute('data-val') : 'Front Only',
-      total_price: priceText
-    })
+    body: formData
   })
   .then(res => res.json())
   .then(data => {

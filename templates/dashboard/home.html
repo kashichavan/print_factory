@@ -57,7 +57,15 @@
                 <img src="{{ order.artwork_file.url }}" alt="Uploaded Artwork" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1">
               </a>
             {% else %}
-              <span style="font-size:11px;color:#94a3b8">No image</span>
+              {% for item in order.items.all %}
+                {% if item.specifications.artwork_url and forloop.first %}
+                  <a href="{{ item.specifications.artwork_url }}" target="_blank" title="Click to view full product artwork image">
+                    <img src="{{ item.specifications.artwork_url }}" alt="Uploaded Product Artwork" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1">
+                  </a>
+                {% endif %}
+              {% empty %}
+                <span style="font-size:11px;color:#94a3b8">No image</span>
+              {% endfor %}
             {% endif %}
           </td>
           <td style="padding:14px 18px">

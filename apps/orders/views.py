@@ -47,7 +47,6 @@ def checkout(request):
         shipping = Decimal("0.00") if (subtotal >= Decimal("999.00") or subtotal == Decimal("0.00")) else Decimal("99.00")
 
         order_number = f"ORD-{int(time.time())}"
-        artwork_file = request.FILES.get("artwork_file")
 
         user = request.user if request.user.is_authenticated else None
         order = Order.objects.create(
@@ -56,7 +55,6 @@ def checkout(request):
             customer_name=customer_name,
             customer_email=customer_email,
             customer_phone=customer_phone,
-            artwork_file=artwork_file,
             subtotal=subtotal,
             tax_amount=tax,
             shipping_amount=shipping,
@@ -87,16 +85,21 @@ def checkout(request):
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=400)
 
+from django.core.files.storage import default_storage
+
 @csrf_exempt
 @require_POST
 def add_to_cart(request):
     try:
         cart = _get_cart(request)
         
-        try:
-            data = json.loads(request.body)
-        except (json.JSONDecodeError, TypeError):
+        if request.content_type and "multipart/form-data" in request.content_type:
             data = request.POST
+        else:
+            try:
+                data = json.loads(request.body)
+            except (json.JSONDecodeError, TypeError):
+                data = request.POST
 
         product_id = data.get("product_id")
         if not product_id:
@@ -119,6 +122,12 @@ def add_to_cart(request):
 
         unit_p = str(round(calculated_total / quantity, 2)) if quantity > 0 else "0.00"
 
+        artwork_file = request.FILES.get("artwork_file")
+        artwork_url = None
+        if artwork_file:
+            saved_name = default_storage.save(f"order_artworks/{artwork_file.name}", artwork_file)
+            artwork_url = default_storage.url(saved_name)
+
         specifications = {
             "paper": paper,
             "corners": corners,
@@ -127,6 +136,8 @@ def add_to_cart(request):
             "unit_price": unit_p,
             "total_price": str(calculated_total),
         }
+        if artwork_url:
+            specifications["artwork_url"] = artwork_url
 
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
@@ -138,6 +149,8 @@ def add_to_cart(request):
             cart_item.quantity += quantity
             curr_total = Decimal(cart_item.specifications.get("total_price", "0")) + calculated_total
             cart_item.specifications["total_price"] = str(curr_total)
+            if artwork_url:
+                cart_item.specifications["artwork_url"] = artwork_url
             cart_item.save()
 
         total_items = sum(item.quantity for item in cart.items.all())

@@ -19,22 +19,41 @@
       <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Ordered Items</h2>
 
       {% for item in order.items.all %}
-      <div class="cart-item-card" style="margin-bottom:12px">
-        <div class="cart-item-media">
-          <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
-        </div>
-        <div class="cart-item-details">
-          <h3 style="font-size:16px;margin:0 0 4px;color:#0f172a">{{ item.product.name }}</h3>
-          <div class="cart-spec-badges">
-            <span class="spec-chip">Qty: {{ item.quantity }} pcs</span>
-            {% if item.unit_price %}
-              <span class="spec-chip">Unit: ₹{{ item.unit_price }}</span>
-            {% endif %}
+      <div class="cart-item-card" style="margin-bottom:16px;padding:16px;border:1px solid #e2e8f0;border-radius:12px;background:#ffffff">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="cart-item-media" style="width:60px;height:60px;border-radius:8px;overflow:hidden;flex-shrink:0">
+              <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+            </div>
+            <div>
+              <h3 style="font-size:16px;margin:0 0 4px;color:#0f172a">{{ item.product.name }}</h3>
+              <div class="cart-spec-badges">
+                <span class="spec-chip">Qty: {{ item.quantity }} pcs</span>
+                {% if item.unit_price %}
+                  <span class="spec-chip">Unit: ₹{{ item.unit_price }}</span>
+                {% endif %}
+                {% if item.specifications.paper %}
+                  <span class="spec-chip">📄 {{ item.specifications.paper }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="cart-item-price">
+            <strong style="font-size:18px;color:#0f172a">₹{{ item.total_price }}</strong>
           </div>
         </div>
-        <div class="cart-item-price">
-          <strong>₹{{ item.total_price }}</strong>
+
+        {% if item.specifications.artwork_url %}
+        <div style="margin-top:12px;padding:12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px">
+          <span style="font-size:12px;font-weight:700;color:#2563eb;display:block;margin-bottom:8px">🖼 Customer Uploaded Product Artwork Image:</span>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <a href="{{ item.specifications.artwork_url }}" target="_blank" title="Click to view full image">
+              <img src="{{ item.specifications.artwork_url }}" alt="Uploaded Artwork" style="max-width:160px;max-height:110px;object-fit:contain;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;padding:2px">
+            </a>
+            <a href="{{ item.specifications.artwork_url }}" target="_blank" class="button button-dark" style="padding:6px 14px;font-size:12px;border-radius:6px;background:#2563eb">View / Download Full Image ↗</a>
+          </div>
         </div>
+        {% endif %}
       </div>
       {% empty %}
       <p style="color:#64748b;font-size:13px">No item records linked.</p>
