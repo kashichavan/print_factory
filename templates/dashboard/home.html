@@ -45,8 +45,8 @@
             <small style="color:#64748b;font-size:11px">{{ order.created_at|date:'d M Y, H:i' }}</small>
           </td>
           <td style="padding:14px 18px;font-size:13px;color:#0f172a;font-weight:600">
-            <div>{{ order.customer_name|default:order.customer.get_full_name|default:"Guest Buyer" }}</div>
-            <small style="color:#475569;display:block">✉ {{ order.customer_email|default:order.customer.email }}</small>
+            <div>{{ order.display_customer_name }}</div>
+            <small style="color:#475569;display:block">✉ {{ order.display_customer_email }}</small>
             {% if order.customer_phone %}
               <small style="color:#2563eb;display:block;font-weight:700">📞 {{ order.customer_phone }}</small>
             {% endif %}

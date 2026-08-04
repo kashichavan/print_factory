@@ -32,8 +32,8 @@
       <small style="display:block;color:#64748b;font-size:11px">{{ order.created_at|date:'d M Y, H:i' }}</small>
     </span>
     <span>
-      <b style="font-size:13px;color:#0f172a;display:block">{{ order.customer_name|default:order.customer.get_full_name|default:"Customer" }}</b>
-      <small style="display:block;color:#475569;font-weight:600">✉ {{ order.customer_email|default:order.customer.email }}</small>
+      <b style="font-size:13px;color:#0f172a;display:block">{{ order.display_customer_name }}</b>
+      <small style="display:block;color:#475569;font-weight:600">✉ {{ order.display_customer_email }}</small>
       {% if order.customer_phone %}
         <small style="display:block;color:#2563eb;font-weight:700">📞 {{ order.customer_phone }}</small>
       {% endif %}

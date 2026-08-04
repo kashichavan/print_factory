@@ -42,6 +42,29 @@ class Order(TimeStampedUUIDModel):
     def total_amount(self):
         return self.subtotal + self.tax_amount + self.shipping_amount - self.discount_amount
 
+    @property
+    def display_customer_name(self):
+        if self.customer_name and self.customer_name.strip():
+            return self.customer_name
+        if self.customer:
+            try:
+                full_name = self.customer.get_full_name()
+                if full_name and full_name.strip():
+                    return full_name
+            except Exception:
+                pass
+            if getattr(self.customer, "email", None):
+                return self.customer.email
+        return "Guest Customer"
+
+    @property
+    def display_customer_email(self):
+        if self.customer_email and self.customer_email.strip():
+            return self.customer_email
+        if self.customer and getattr(self.customer, "email", None):
+            return self.customer.email
+        return "N/A"
+
     class Meta: indexes = [models.Index(fields=["status", "created_at"]), models.Index(fields=["customer", "created_at"])]
 
 class OrderItem(TimeStampedUUIDModel):

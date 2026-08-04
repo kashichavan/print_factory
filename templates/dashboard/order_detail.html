@@ -71,11 +71,11 @@
       <div class="pdp-specs-table">
         <div class="pdp-spec-row">
           <span>Customer Name</span>
-          <b style="color:#0f172a">{{ order.customer_name|default:order.customer.get_full_name|default:"Guest Customer" }}</b>
+          <b style="color:#0f172a">{{ order.display_customer_name }}</b>
         </div>
         <div class="pdp-spec-row">
           <span>Email Address</span>
-          <b style="color:#2563eb">✉ {{ order.customer_email|default:order.customer.email|default:"N/A" }}</b>
+          <b style="color:#2563eb">✉ {{ order.display_customer_email }}</b>
         </div>
         <div class="pdp-spec-row">
           <span>Mobile Phone Number</span>
