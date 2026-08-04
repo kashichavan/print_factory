@@ -198,3 +198,27 @@ def remove_from_cart(request, item_id):
 def cart_count(request):
     cart = _get_cart(request)
     return JsonResponse({"cart_count": cart.items.count()})
+
+@csrf_exempt
+@require_POST
+def upload_cart_item_image(request, item_id):
+    try:
+        cart = _get_cart(request)
+        item = get_object_or_404(CartItem, id=item_id, cart=cart)
+        artwork_file = request.FILES.get("artwork_file")
+        if not artwork_file:
+            return JsonResponse({"success": False, "message": "No file uploaded."}, status=400)
+
+        file_name = default_storage.save(f"order_artworks/{artwork_file.name}", artwork_file)
+        file_url = default_storage.url(file_name)
+
+        item.specifications["artwork_url"] = file_url
+        item.save()
+
+        return JsonResponse({
+            "success": True,
+            "message": "Artwork image uploaded successfully!",
+            "artwork_url": file_url
+        })
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=400)

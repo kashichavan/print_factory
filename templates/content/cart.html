@@ -45,6 +45,23 @@
           {% endif %}
         </div>
 
+        <!-- Direct Per-Product Image Upload Box on Cart Page -->
+        <div style="margin-top:10px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;">
+          <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">
+            🖼 Upload Logo / Artwork Image for this item (Optional)
+          </label>
+          {% if item.specifications.artwork_url %}
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <a href="{{ item.specifications.artwork_url }}" target="_blank">
+                <img src="{{ item.specifications.artwork_url }}" alt="Uploaded Artwork Image" style="width:48px;height:48px;object-fit:contain;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;padding:2px">
+              </a>
+              <span style="font-size:12px;color:#059669;font-weight:700">✓ Image Attached &amp; Sent to Owner</span>
+            </div>
+          {% endif %}
+          <input type="file" accept="image/*,.pdf,.ai,.psd" onchange="uploadCartItemImage(this, '{{ item.id }}')" style="width:100%;font-size:12px;box-sizing:border-box;">
+          <span id="status-{{ item.id }}" style="display:block;margin-top:4px;font-size:11px;color:#64748b;"></span>
+        </div>
+
         <div class="cart-item-foot">
           <form method="POST" action="{% url 'orders:remove_from_cart' item.id %}" style="margin:0">
             {% csrf_token %}
@@ -170,6 +187,37 @@
   </div>
 
   <script>
+  function uploadCartItemImage(inputEl, itemId) {
+    if (!inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    const statusEl = document.getElementById('status-' + itemId);
+    if (statusEl) statusEl.innerHTML = '<span style="color:#2563eb;font-weight:600">Uploading image... ⏳</span>';
+
+    const formData = new FormData();
+    formData.append('artwork_file', file);
+
+    fetch(`/cart/upload-item-image/${itemId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:#059669;font-weight:700">✓ Image uploaded! Reloading...</span>';
+        setTimeout(() => { location.reload(); }, 600);
+      } else {
+        if (statusEl) statusEl.innerText = 'Upload failed: ' + (data.message || 'Error');
+      }
+    })
+    .catch(err => {
+      console.error('Upload error:', err);
+      if (statusEl) statusEl.innerText = 'Failed to upload image.';
+    });
+  }
+
   function openCheckoutModal() {
     document.getElementById('checkout-modal').classList.add('is-open');
   }
