@@ -96,3 +96,7 @@ def contact(request):
         messages.success(request, "Thanks — our team will get back to you shortly.")
         return redirect("content:contact")
     return render(request, "content/contact.html")
+
+
+def about(request):
+    return render(request, "content/about.html")

@@ -37,7 +37,7 @@
       <nav class="nav-links" id="main-nav-links">
         <a href="{% url 'content:shop' %}" class="{% if request.resolver_match.url_name == 'shop' %}active{% endif %}">Shop Catalog</a>
         <a href="{% url 'content:services' %}" class="{% if request.resolver_match.url_name == 'services' %}active{% endif %}">Services</a>
-        <a href="{% url 'content:business_cards' %}" class="{% if request.resolver_match.url_name == 'business_cards' %}active{% endif %}">Business Cards</a>
+        <a href="{% url 'content:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About Us</a>
         <a href="{% url 'content:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
       </nav>
 
@@ -79,6 +79,7 @@
         <nav class="drawer-nav">
           <a href="{% url 'content:shop' %}" class="drawer-link" onclick="closeSidebarDrawer()">Full Shop Catalog</a>
           <a href="{% url 'content:services' %}" class="drawer-link" onclick="closeSidebarDrawer()">Production Services</a>
+          <a href="{% url 'content:about' %}" class="drawer-link" onclick="closeSidebarDrawer()">About Us</a>
           <a href="{% url 'orders:cart_detail' %}" class="drawer-link" onclick="closeSidebarDrawer()">View Cart</a>
           <a href="{% url 'content:contact' %}" class="drawer-link" onclick="closeSidebarDrawer()">Request Custom Quote</a>
         </nav>
@@ -123,7 +124,7 @@
         </div>
       </div>
       <div>
-        <a href="{% url 'content:business_cards' %}">Business Cards</a>
+        <a href="{% url 'content:about' %}">About Us</a>
         <a href="{% url 'content:services' %}">Services</a>
         <a href="{% url 'content:shop' %}">Shop Catalog</a>
         <a href="{% url 'content:contact' %}">Contact Us</a>
