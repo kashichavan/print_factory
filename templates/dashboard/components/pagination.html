@@ -2,31 +2,31 @@
 Reusable Pagination Component — The Print Planet
 {% endcomment %}
 {% if page_obj.has_other_pages %}
-<div class="dash-pagination glass-panel" style="padding:12px 18px;border-radius:10px;background:#ffffff;border:1px solid #e2e8f0;margin-top:20px;display:flex;align-items:center;justify-content:space-between">
-  <div style="font-size:12px;color:#64748b;font-weight:500">
+<div class="dash-pagination">
+  <div class="pagination-info">
     Page <b>{{ page_obj.number }}</b> of <b>{{ page_obj.paginator.num_pages }}</b> (Total <b>{{ page_obj.paginator.count }}</b> items)
   </div>
 
-  <div style="display:flex;gap:6px">
+  <div class="pagination-actions">
     {% if page_obj.has_previous %}
-      <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="button button-light" style="padding:5px 12px;font-size:12px;border-radius:6px">
-        Previous
+      <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="pagination-btn">
+        ← Previous
       </a>
     {% endif %}
 
     {% for i in page_obj.paginator.page_range %}
       {% if page_obj.number == i %}
-        <span class="button button-dark" style="padding:5px 12px;font-size:12px;border-radius:6px;background:#2563eb">{{ i }}</span>
+        <span class="pagination-btn active">{{ i }}</span>
       {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
-        <a href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="button button-light" style="padding:5px 12px;font-size:12px;border-radius:6px">
+        <a href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="pagination-btn">
           {{ i }}
         </a>
       {% endif %}
     {% endfor %}
 
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="button button-light" style="padding:5px 12px;font-size:12px;border-radius:6px">
-        Next
+      <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="pagination-btn">
+        Next →
       </a>
     {% endif %}
   </div>

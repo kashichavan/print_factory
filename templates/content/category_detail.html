@@ -96,31 +96,31 @@
 
 <!-- Category Pagination Bar -->
 {% if products.has_other_pages %}
-<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;margin:30px 0 60px;flex-wrap:wrap;gap:12px">
-  <div style="font-size:13px;color:#64748b;font-weight:500">
+<div class="wrap vp-pagination-bar">
+  <div class="pagination-info">
     Showing <b>{{ products.start_index }}–{{ products.end_index }}</b> of <b>{{ products.paginator.count }}</b> products
   </div>
 
-  <div style="display:flex;align-items:center;gap:6px">
+  <div class="pagination-actions">
     {% if products.has_previous %}
-      <a href="?page={{ products.previous_page_number }}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
-        Previous
+      <a href="?page={{ products.previous_page_number }}" class="pagination-btn">
+        ← Previous
       </a>
     {% endif %}
 
     {% for i in products.paginator.page_range %}
       {% if products.number == i %}
-        <span class="vp-tab active" style="padding:6px 14px;font-size:13px;border-radius:8px;background:#2563eb;color:#ffffff;border-color:#2563eb">{{ i }}</span>
+        <span class="pagination-btn active">{{ i }}</span>
       {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
-        <a href="?page={{ i }}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+        <a href="?page={{ i }}" class="pagination-btn">
           {{ i }}
         </a>
       {% endif %}
     {% endfor %}
 
     {% if products.has_next %}
-      <a href="?page={{ products.next_page_number }}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
-        Next
+      <a href="?page={{ products.next_page_number }}" class="pagination-btn">
+        Next →
       </a>
     {% endif %}
   </div>

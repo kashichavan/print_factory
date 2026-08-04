@@ -82,14 +82,28 @@
 
 <!-- Pagination Bar -->
 {% if products.has_other_pages %}
-<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 60px">
-  {% if products.has_previous %}
-    <a href="?page={{ products.previous_page_number }}" class="vp-tab">← Previous</a>
-  {% endif %}
-  <span style="font-size:13px;font-weight:700;color:var(--muted)">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
-  {% if products.has_next %}
-    <a href="?page={{ products.next_page_number }}" class="vp-tab">Next →</a>
-  {% endif %}
+<div class="wrap vp-pagination-bar">
+  <div class="pagination-info">
+    Page <b>{{ products.number }}</b> of <b>{{ products.paginator.num_pages }}</b> (Total <b>{{ products.paginator.count }}</b> products)
+  </div>
+
+  <div class="pagination-actions">
+    {% if products.has_previous %}
+      <a href="?page={{ products.previous_page_number }}" class="pagination-btn">← Previous</a>
+    {% endif %}
+
+    {% for i in products.paginator.page_range %}
+      {% if products.number == i %}
+        <span class="pagination-btn active">{{ i }}</span>
+      {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
+        <a href="?page={{ i }}" class="pagination-btn">{{ i }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+      <a href="?page={{ products.next_page_number }}" class="pagination-btn">Next →</a>
+    {% endif %}
+  </div>
 </div>
 {% endif %}
 
