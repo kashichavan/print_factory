@@ -4,8 +4,12 @@
 <section class="vp-hero">
   <div class="wrap vp-hero-inner">
     <div class="vp-hero-copy">
-      <div class="vp-badge">CUSTOM PRINT &amp; PACKAGING PLATFORM</div>
-      <h1>Make an unforgettable<br><em>first impression.</em></h1>
+      <div class="code-badge">CUSTOM PRINT &amp; PACKAGING PLATFORM</div>
+      <h1 class="typing-headline">
+        <span id="typewriter-headline">Make an unforgettable</span><span class="typewriter-cursor">|</span>
+        <br>
+        <em style="color:#2563eb;font-style:italic">first impression.</em>
+      </h1>
       <p class="vp-hero-lead">Enterprise business cards, custom packaging, branded apparel, signage, and corporate merchandise. Engineered for modern brands.</p>
 
       <div class="vp-trust-pills">
@@ -270,5 +274,22 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+
+// Coding Style Typewriter Animation
+document.addEventListener('DOMContentLoaded', () => {
+  const target = document.getElementById('typewriter-headline');
+  if (!target) return;
+  const text = "Make an unforgettable";
+  target.innerText = "";
+  let i = 0;
+  function typeChar() {
+    if (i < text.length) {
+      target.innerText += text.charAt(i);
+      i++;
+      setTimeout(typeChar, 60);
+    }
+  }
+  setTimeout(typeChar, 200);
+});
 </script>
 {% endblock %}

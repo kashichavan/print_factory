@@ -267,6 +267,56 @@ a { color: inherit; text-decoration: none; }
 /* --------------------------------------------------------------------------
    SECTION 3: HERO & STOREFRONT CATEGORY TILES
    -------------------------------------------------------------------------- */
+/* Coding Style Typewriter & Hero Entrance Animations */
+.code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Consolas', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: var(--blue-primary);
+  border: 1px solid var(--blue-border);
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+.code-badge::before {
+  content: '>';
+  color: var(--blue-primary);
+  font-weight: 900;
+}
+
+.typing-headline {
+  font: 700 clamp(34px, 4.2vw, 56px)/1.1 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -1.5px;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+#typewriter-headline {
+  font-family: 'Consolas', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  letter-spacing: -0.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: var(--blue-primary);
+  font-weight: 400;
+  animation: blinkCursor 0.75s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 .vp-hero {
   background: #ffffff;
   color: var(--ink);
@@ -279,12 +329,26 @@ a { color: inherit; text-decoration: none; }
   margin-top: 24px;
 }
 .vp-hero-inner { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items: center; }
-.vp-badge { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--blue-primary); margin-bottom: 12px; text-transform: uppercase; }
-.vp-hero h1 { font: 700 clamp(36px, 4.2vw, 56px)/1.05 'Fraunces', Georgia, serif; letter-spacing: -2px; margin: 0 0 14px; color: var(--ink); }
-.vp-hero-lead { font-size: 15px; line-height: 1.6; color: #64748b; max-width: 520px; margin-bottom: 24px; }
+.vp-hero-copy { animation: heroFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .vp-trust-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .vp-pill { padding: 6px 14px; background: var(--blue-light); border: 1px solid var(--blue-border); border-radius: 99px; font-size: 12px; font-weight: 700; color: var(--blue-primary); }
-.vp-hero-art { height: 300px; border-radius: 14px; overflow: hidden; border: 1px solid var(--subtle-border); box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05); }
+.vp-hero-art {
+  height: 300px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--subtle-border);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  animation: heroArtFloat 4s ease-in-out infinite alternate;
+}
+@keyframes heroArtFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
 .vp-hero-art img { width: 100%; height: 100%; object-fit: cover; }
 
 .category-storefront { padding-top: 40px; padding-bottom: 40px; }
