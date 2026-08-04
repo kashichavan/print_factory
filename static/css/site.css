@@ -745,11 +745,252 @@ input[type=file]::file-selector-button:hover { background: var(--blue-dark); }
 .contact-value:hover { color: var(--blue-primary); }
 .contact-value-text { font-size: 13px; color: var(--ink); margin: 0; line-height: 1.45; font-weight: 600; }
 
-footer { background: var(--ink); color: white; padding: 50px 0 20px; margin-top: 80px; }
-.footer-grid { display: grid; grid-template-columns: 1.2fr 2fr 1fr; gap: 35px; }
-.footer-grid p { max-width: 410px; color: #cbd5e1; font-size: 14px; margin: 0; }
-.footer-grid div:last-child { display: grid; gap: 9px; font-size: 14px; }
-.copyright { margin-top: 45px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.15); font-size: 11px; color: #94a3b8; }
+/* --------------------------------------------------------------------------
+   ENTERPRISE FOOTER SYSTEM
+   -------------------------------------------------------------------------- */
+.site-footer {
+  background: #0b1329;
+  color: #f8fafc;
+  margin-top: 90px;
+  padding-top: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.footer-cta-banner {
+  transform: translateY(-40px);
+  margin-bottom: -20px;
+}
+.footer-cta-inner {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+.footer-cta-inner h3 {
+  font: 700 24px/1.2 'Fraunces', Georgia, serif;
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+.footer-cta-inner p {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0;
+}
+.footer-cta-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.footer-btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+.footer-btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+.footer-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
+}
+.footer-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.footer-main-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  padding: 30px 0 60px;
+}
+
+.footer-col h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 20px;
+  letter-spacing: -0.2px;
+  position: relative;
+}
+.footer-col h4::after {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: #38bdf8;
+  margin-top: 8px;
+  border-radius: 2px;
+}
+
+.footer-brand {
+  font-size: 24px;
+  text-decoration: none;
+}
+.footer-bio {
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 14px 0 20px;
+}
+
+.footer-trust-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.footer-trust-pills span {
+  font-size: 12px;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-links a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+.footer-links a:hover {
+  color: #38bdf8;
+  transform: translateX(4px);
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.footer-contact-item .icon {
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.footer-contact-item small {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.footer-contact-item a,
+.footer-contact-item span {
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.footer-contact-item a:hover {
+  color: #38bdf8;
+}
+
+.footer-bottom-bar {
+  background: #070d1e;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px 0;
+  font-size: 13px;
+  color: #64748b;
+}
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-payment-tags {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+.footer-sub-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-sub-links a {
+  color: #94a3b8;
+  text-decoration: none;
+}
+.footer-sub-links a:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  .footer-main-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding-bottom: 75px;
+  }
+  .footer-cta-inner {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px 20px;
+  }
+  .footer-cta-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+  .footer-btn-primary, .footer-btn-secondary {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .footer-main-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 20px 0 40px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+}
 
 /* --------------------------------------------------------------------------
    SECTION 10: SHOPPING CART & CHECKOUT SUMMARY MODULE
