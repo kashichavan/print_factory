@@ -7,12 +7,22 @@ from .models import Service
 
 
 def home(request):
+    active_cat_slug = request.GET.get("category", "")
     categories = Category.objects.filter(is_active=True).prefetch_related("products")
-    featured_products = Product.objects.filter(is_active=True).select_related("category").order_by("-created_at")[:12]
     
+    if active_cat_slug:
+        qs = Product.objects.filter(category__slug=active_cat_slug, is_active=True).select_related("category").prefetch_related("options__values", "price_rules").order_by("-created_at")
+    else:
+        qs = Product.objects.filter(is_active=True).select_related("category").prefetch_related("options__values", "price_rules").order_by("-created_at")
+
+    paginator = Paginator(qs, 8)
+    page_number = request.GET.get("page", 1)
+    products_page = paginator.get_page(page_number)
+
     return render(request, "content/home.html", {
         "categories": categories,
-        "products": featured_products,
+        "products": products_page,
+        "active_category_slug": active_cat_slug,
         "services": Service.objects.filter(is_active=True)[:3],
     })
 

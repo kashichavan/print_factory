@@ -6,15 +6,15 @@
 <section class="vp-hero">
   <div class="wrap vp-hero-inner">
     <div class="vp-hero-copy">
-      <div class="vp-badge">✦ END-TO-END PRODUCTION</div>
+      <div class="vp-badge">END-TO-END PRODUCTION</div>
       <h1>Services &amp; Craft</h1>
       <p class="vp-hero-lead">From high-speed digital short runs to bulk offset printing, indoor/outdoor signage, and corporate merchandise—engineered for brand perfection.</p>
       
       <div class="vp-trust-pills">
-        <span class="vp-pill">✓ Agile Digital &amp; Offset</span>
-        <span class="vp-pill">✓ Pantone Color Calibration</span>
-        <span class="vp-pill">✓ 24hr Express Turnaround</span>
-        <span class="vp-pill">✓ Dedicated Project Manager</span>
+        <span class="vp-pill">Agile Digital &amp; Offset</span>
+        <span class="vp-pill">Pantone Color Calibration</span>
+        <span class="vp-pill">24hr Express Turnaround</span>
+        <span class="vp-pill">Dedicated Project Manager</span>
       </div>
     </div>
     <div class="vp-hero-art">
@@ -23,7 +23,7 @@
   </div>
 </section>
 
-<!-- Service Filter Pills (Populated Live from DB) -->
+<!-- Service Filter Pills -->
 <section class="wrap vp-filter-bar">
   <div class="vp-tabs">
     {% for srv in services %}
@@ -35,12 +35,12 @@
   </div>
 </section>
 
-<!-- Dynamic Bento Grid Services Showcase (Loaded Live from Database) -->
+<!-- Dynamic Services Showcase -->
 <section class="wrap vp-catalog-grid" style="padding-bottom:80px">
   {% for srv in services %}
   <article id="{{ srv.slug }}" class="vp-product-card bento-col-6">
     <div class="vp-card-media" style="height:220px">
-      <span class="vp-card-tag gold">{{ srv.badge }}</span>
+      <span class="vp-card-tag">{{ srv.badge }}</span>
       <img src="{{ srv.get_image_url }}" alt="{{ srv.title }}">
     </div>
     <div class="vp-card-content">
@@ -62,7 +62,7 @@
         </div>
         <button type="button" class="vp-btn-customize" 
                 onclick="openServiceQuoteModal('{{ srv.title|escapejs }}', '{{ srv.base_rate }}', '{{ srv.get_image_url|escapejs }}')">
-          Calculate Quote ↗
+          Calculate Quote
         </button>
       </div>
     </div>
@@ -76,32 +76,32 @@
 
 <!-- 4-Step Production Workflow -->
 <section class="services-process wrap" style="padding-top:60px;padding-bottom:100px">
-  <p class="eyebrow">SMART PRODUCTION WORKFLOW</p>
-  <h2>From initial brief<br>to final delivery.</h2>
+  <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">PRODUCTION WORKFLOW</p>
+  <h2 style="font:700 28px 'Fraunces', serif;margin:0;color:#0f172a">From initial brief to final delivery</h2>
 
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:40px">
-    <div class="glass-panel" style="padding:24px">
-      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 01</span>
-      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">File Proofing</h3>
-      <p style="font-size:13px;color:var(--muted);margin:0">Automated preflight check on vector lines, DPI resolution, and Bleed margins.</p>
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <span style="font-size:11px;font-weight:800;color:#2563eb">STEP 01</span>
+      <h3 style="font:600 20px 'Fraunces',serif;margin:10px 0 6px;color:#0f172a">File Proofing</h3>
+      <p style="font-size:13px;color:#64748b;margin:0">Automated preflight check on vector lines, DPI resolution, and bleed margins.</p>
     </div>
 
-    <div class="glass-panel" style="padding:24px">
-      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 02</span>
-      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">Color Matching</h3>
-      <p style="font-size:13px;color:var(--muted);margin:0">Pantone matching system ensures true brand color reproduction across paper stocks.</p>
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <span style="font-size:11px;font-weight:800;color:#2563eb">STEP 02</span>
+      <h3 style="font:600 20px 'Fraunces',serif;margin:10px 0 6px;color:#0f172a">Color Matching</h3>
+      <p style="font-size:13px;color:#64748b;margin:0">Pantone matching system ensures true brand color reproduction across paper stocks.</p>
     </div>
 
-    <div class="glass-panel" style="padding:24px">
-      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 03</span>
-      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">Precision Finish</h3>
-      <p style="font-size:13px;color:var(--muted);margin:0">Computerized die-cutting, spot UV lamination, metallic foil stamping, and binding.</p>
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <span style="font-size:11px;font-weight:800;color:#2563eb">STEP 03</span>
+      <h3 style="font:600 20px 'Fraunces',serif;margin:10px 0 6px;color:#0f172a">Precision Finish</h3>
+      <p style="font-size:13px;color:#64748b;margin:0">Computerized die-cutting, spot UV lamination, metallic foil stamping, and binding.</p>
     </div>
 
-    <div class="glass-panel" style="padding:24px">
-      <span style="font-size:11px;font-weight:800;color:var(--orange)">STEP 04</span>
-      <h3 style="font:600 20px Fraunces,serif;margin:10px 0 6px">Express Dispatch</h3>
-      <p style="font-size:13px;color:var(--muted);margin:0">Inspected, shrink-wrapped, and dispatched with real-time tracking across India.</p>
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <span style="font-size:11px;font-weight:800;color:#2563eb">STEP 04</span>
+      <h3 style="font:600 20px 'Fraunces',serif;margin:10px 0 6px;color:#0f172a">Express Dispatch</h3>
+      <p style="font-size:13px;color:#64748b;margin:0">Inspected, shrink-wrapped, and dispatched with real-time tracking across India.</p>
     </div>
   </div>
 </section>
@@ -141,7 +141,7 @@
         <span>Estimated Rate:</span>
         <strong id="srv-calc-price">₹490.00</strong>
       </div>
-      <a href="{% url 'content:contact' %}" class="vp-btn-add-cart" style="text-decoration:none">Proceed to Inquiry ↗</a>
+      <a href="{% url 'content:contact' %}" class="vp-btn-add-cart" style="text-decoration:none">Proceed to Inquiry</a>
     </div>
   </div>
 </div>

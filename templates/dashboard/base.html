@@ -2,32 +2,16 @@
 {% block title %}Owner Command Center | The Print Planet{% endblock %}
 
 {% block content %}
-<section class="dashboard wrap" style="padding-top:40px;padding-bottom:80px">
-  <!-- Left Side Navigation Bar -->
-  <aside class="side glass-panel" style="padding:24px;border-radius:20px">
-    <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #1e223020">
-      <span class="dash-mark" style="font-size:10px;letter-spacing:1.5px;font-weight:800;color:var(--orange)">OWNER COMMAND CENTER</span>
-      <h3 style="font:700 20px Fraunces,serif;margin:4px 0 0">Control Hub</h3>
-    </div>
+<div class="wrap" style="padding-top:30px;padding-bottom:60px">
+  {% include 'dashboard/components/header.html' %}
 
-    <a href="{% url 'dashboard:home' %}" class="dash-nav-item">📊 Overview</a>
-    <a href="{% url 'dashboard:product_list' %}" class="dash-nav-item">📦 Product Catalog</a>
-    <a href="{% url 'dashboard:service_list' %}" class="dash-nav-item">🛠️ Production Services</a>
-    <a href="{% url 'dashboard:order_list' %}" class="dash-nav-item">🛒 Orders &amp; Jobs</a>
-    <a href="{% url 'dashboard:lead_list' %}" class="dash-nav-item">📩 Lead Enquiries</a>
-    <a href="{% url 'dashboard:product_create' %}" class="dash-nav-item" style="color:var(--orange)">➕ Add New Product</a>
+  <div class="dashboard" style="display:grid;grid-template-columns:280px 1fr;gap:30px;align-items:start">
+    {% include 'dashboard/components/sidebar.html' %}
 
-    <div style="margin-top:auto;padding-top:20px;border-top:1px solid #1e223020">
-      <form method="post" action="{% url 'dashboard:logout' %}">
-        {% csrf_token %}
-        <button class="button button-dark" style="width:100%;justify-center">Sign Out 🚪</button>
-      </form>
-    </div>
-  </aside>
-
-  <!-- Right Dashboard Content Area -->
-  <div class="dash-content">
-    {% block dashboard_content %}{% endblock %}
+    <main class="dash-content">
+      {% include 'dashboard/components/alerts.html' %}
+      {% block dashboard_content %}{% endblock %}
+    </main>
   </div>
-</section>
+</div>
 {% endblock %}

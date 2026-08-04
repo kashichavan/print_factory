@@ -2,91 +2,88 @@
 {% block title %}Lead Enquiries &amp; Staff Attribution | Owner Dashboard{% endblock %}
 
 {% block dashboard_content %}
-<div class="dash-heading">
+<div class="dash-heading" style="margin-bottom:24px">
   <div>
-    <p class="eyebrow">STAFF ATTRIBUTION &amp; SALES PIPELINE</p>
-    <h1>Customer Enquiries &amp; Quotes</h1>
+    <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">SALES PIPELINE &amp; ATTRIBUTION</p>
+    <h1 style="font:700 28px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.4px">Customer Enquiries</h1>
   </div>
 </div>
 
 <!-- Status Filter Tabs -->
-<div class="filters" style="margin-bottom:24px;display:flex;gap:10px;flex-wrap:wrap">
+<div class="filters" style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap">
   <a href="{% url 'dashboard:lead_list' %}" class="vp-tab {% if not selected_status %}active{% endif %}">All Enquiries</a>
   {% for code, label in status_choices %}
   <a href="?status={{ code }}" class="vp-tab {% if selected_status == code %}active{% endif %}">{{ label }}</a>
   {% endfor %}
 </div>
 
-<!-- Leads Table with Staff Attribution -->
-<div class="order-table glass-panel" style="padding:10px 20px;background:#ffffff">
-  <div class="table-row table-label" style="grid-template-columns:1.2fr 1fr 1.5fr 1fr 1fr 1.2fr">
-    <span>Contact Name &amp; Email</span>
-    <span>Phone</span>
-    <span>Requirement Message</span>
-    <span>Status Reason</span>
-    <span>Updated By Staff</span>
-    <span>Update Status</span>
-  </div>
-
-  {% for lead in leads %}
-  <div class="table-row" style="grid-template-columns:1.2fr 1fr 1.5fr 1fr 1fr 1.2fr;align-items:center">
-    <span>
-      <b>{{ lead.name }}</b>
-      <small>{{ lead.email }}</small>
-    </span>
-    <span>{{ lead.phone|default:"Not provided" }}</span>
-    <span><small>{{ lead.message|truncatewords:10 }}</small></span>
-    <span>
-      <small style="color:var(--muted)">{{ lead.status_reason|default:"No reason logged" }}</small>
-    </span>
-    <span>
-      {% if lead.updated_by %}
-        <b>{{ lead.updated_by.email|truncatechars:18 }}</b>
-        <small>{{ lead.updated_at|date:'d M, H:i' }}</small>
-      {% else %}
-        <small style="color:var(--muted)">Unassigned</small>
-      {% endif %}
-    </span>
-    <span>
-      <button type="button" class="button button-dark" style="padding:6px 12px;font-size:12px;border-radius:6px"
-              onclick="openLeadModal('{{ lead.id }}', '{{ lead.name|escapejs }}', '{{ lead.status }}', '{{ lead.status_reason|escapejs }}')">
-        Update ✏️
-      </button>
-    </span>
-  </div>
-  {% empty %}
-  <div class="empty" style="padding:40px 0;text-align:center">
-    <p>No customer enquiries found matching selected status filter.</p>
-  </div>
-  {% endfor %}
+<!-- Leads Table -->
+<div class="glass-panel" style="padding:0;overflow:hidden;border-radius:14px;background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(15,23,42,0.03)">
+  <table style="width:100%;border-collapse:collapse;text-align:left">
+    <thead>
+      <tr style="background:#eff6ff;border-bottom:1px solid #dbeafe;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:#64748b">
+        <th style="padding:14px 18px">Contact Name &amp; Email</th>
+        <th style="padding:14px 18px">Phone</th>
+        <th style="padding:14px 18px">Requirement Message</th>
+        <th style="padding:14px 18px">Status Reason</th>
+        <th style="padding:14px 18px">Staff Attribution</th>
+        <th style="padding:14px 18px;text-align:right">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lead in leads %}
+      <tr style="border-bottom:1px solid #f1f5f9">
+        <td style="padding:14px 18px">
+          <b style="font-size:14px;color:#0f172a;display:block">{{ lead.name }}</b>
+          <small style="color:#64748b;font-size:12px">{{ lead.email }}</small>
+        </td>
+        <td style="padding:14px 18px;font-size:13px;color:#0f172a">
+          {{ lead.phone|default:"Not provided" }}
+        </td>
+        <td style="padding:14px 18px;font-size:13px;color:#64748b">
+          {{ lead.message|truncatewords:8 }}
+        </td>
+        <td style="padding:14px 18px;font-size:12px;color:#64748b">
+          {{ lead.status_reason|default:"No status log" }}
+        </td>
+        <td style="padding:14px 18px">
+          {% if lead.updated_by %}
+            <b style="font-size:12px;color:#0f172a;display:block">{{ lead.updated_by.email|truncatechars:18 }}</b>
+            <small style="color:#64748b;font-size:11px">{{ lead.updated_at|date:'d M, H:i' }}</small>
+          {% else %}
+            <small style="color:#64748b">Unassigned</small>
+          {% endif %}
+        </td>
+        <td style="padding:14px 18px;text-align:right">
+          <button type="button" class="button button-dark" style="padding:5px 12px;font-size:12px;border-radius:6px;background:#2563eb"
+                  onclick="openLeadModal('{{ lead.id }}', '{{ lead.name|escapejs }}', '{{ lead.status }}', '{{ lead.status_reason|escapejs }}')">
+            Update Status
+          </button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" style="padding:40px;text-align:center;color:#64748b">
+          No customer enquiries found matching selected status filter.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <!-- Pagination Controls -->
-{% if leads.has_other_pages %}
-<div class="vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px">
-  {% if leads.has_previous %}
-    <a href="?page={{ leads.previous_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">← Previous</a>
-  {% endif %}
+{% include 'dashboard/components/pagination.html' with page_obj=leads %}
 
-  <span style="font-size:13px;font-weight:700;color:var(--ink)">
-    Page {{ leads.number }} of {{ leads.paginator.num_pages }}
-  </span>
-
-  {% if leads.has_next %}
-    <a href="?page={{ leads.next_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">Next →</a>
-  {% endif %}
-</div>
-{% endif %}
-
-<!-- Lead Update Modal with Staff Reason & Notes -->
+<!-- Lead Update Modal -->
 <div id="lead-modal" class="vp-modal-overlay">
-  <div class="vp-modal-box" style="max-width:500px">
+  <div class="vp-modal-box" style="max-width:480px">
     <button class="vp-modal-close" onclick="closeLeadModal()">✕</button>
     <div class="vp-modal-header">
-      <h2 id="lead-modal-title">Update Lead Status</h2>
-      <p>Attributed to staff user: <b>{{ request.user.email }}</b></p>
+      <h2 id="lead-modal-title" style="font-size:22px">Update Lead Status</h2>
+      <p style="font-size:13px">Attributed to staff user: <b>{{ request.user.email }}</b></p>
     </div>
-    <form id="lead-update-form" method="post" class="dash-dynamic-form" style="padding:24px">
+    <form id="lead-update-form" method="post" class="dash-dynamic-form" style="padding:20px 24px">
       {% csrf_token %}
       <label>
         <b>Pipeline Status</b>
@@ -99,7 +96,7 @@
 
       <label>
         <b>Status Reason / Summary</b>
-        <input type="text" name="status_reason" id="lead-modal-reason" placeholder="e.g. Sent formal quotation for 500 mailer boxes @ ₹45/pc">
+        <input type="text" name="status_reason" id="lead-modal-reason" placeholder="e.g. Sent formal quotation for 500 mailer boxes">
       </label>
 
       <label>
@@ -107,7 +104,7 @@
         <textarea name="note" rows="3" placeholder="Add follow-up notes for the team..."></textarea>
       </label>
 
-      <button type="submit" class="button button-dark" style="width:100%;margin-top:16px;justify-content:center">Save &amp; Attribute to Me ↗</button>
+      <button type="submit" class="button button-dark" style="width:100%;margin-top:14px;justify-content:center;padding:12px;border-radius:8px;background:#2563eb">Save Lead Update</button>
     </form>
   </div>
 </div>

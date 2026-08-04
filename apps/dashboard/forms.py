@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django import forms
 from django.utils.text import slugify
 from apps.catalog.models import Category, Product
@@ -7,6 +8,7 @@ from apps.orders.models import Order
 class ProductForm(forms.ModelForm):
     image = forms.ImageField(required=False, widget=forms.FileInput(attrs={"accept": "image/*"}))
     product_type = forms.ChoiceField(choices=Product.ProductType.choices, initial=Product.ProductType.PRINT, required=False)
+    base_price = forms.DecimalField(required=False, initial=Decimal("190.00"), max_digits=12, decimal_places=2)
     is_active = forms.BooleanField(initial=True, required=False, label="Publish Live on Storefront")
 
     class Meta:
@@ -29,6 +31,12 @@ class ProductForm(forms.ModelForm):
             "base_price": forms.NumberInput(attrs={"placeholder": "190.00", "step": "0.01"}),
             "badge": forms.TextInput(attrs={"placeholder": "e.g. Bestseller / 3D Foil / 100% Recycled"}),
         }
+
+    def clean_base_price(self):
+        bp = self.cleaned_data.get("base_price")
+        if bp is None:
+            return Decimal("190.00")
+        return bp
 
     def clean_product_type(self):
         pttype = self.cleaned_data.get("product_type")
@@ -58,8 +66,8 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ["name", "icon", "badge", "description", "is_active"]
         widgets = {
-            "icon": forms.TextInput(attrs={"placeholder": "e.g. 💳 / 📦 / 👕"}),
-            "badge": forms.TextInput(attrs={"placeholder": "e.g. 50+ Stocks / Custom Sizes"}),
+            "icon": forms.TextInput(attrs={"placeholder": "e.g. cards, packaging, apparel"}),
+            "badge": forms.TextInput(attrs={"placeholder": "e.g. Bestseller, Custom Options"}),
         }
 
     def save(self, commit=True):
@@ -73,18 +81,19 @@ class CategoryForm(forms.ModelForm):
 class OrderTrackingForm(forms.ModelForm):
     carrier = forms.CharField(max_length=100, required=False)
     tracking_number = forms.CharField(max_length=120, required=False)
+    notes = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), required=False)
 
     class Meta:
         model = Order
         fields = ["status", "notes"]
-        widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        shipment = self.instance.shipments.first()
-        if shipment:
-            self.fields["carrier"].initial = shipment.carrier
-            self.fields["tracking_number"].initial = shipment.tracking_number
+        if self.instance and self.instance.pk:
+            shipment = self.instance.shipments.first()
+            if shipment:
+                self.fields["carrier"].initial = shipment.carrier
+                self.fields["tracking_number"].initial = shipment.tracking_number
 
 
 class ServiceForm(forms.ModelForm):

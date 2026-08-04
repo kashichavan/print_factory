@@ -1,0 +1,31 @@
+{% comment %}
+Owner Dashboard Top Header Component — The Print Planet
+{% endcomment %}
+<header class="dash-top-header glass-panel" style="padding:16px 24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;border-radius:14px;background:#ffffff;border:1px solid #e2e8f0">
+  <div style="display:flex;align-items:center;gap:14px">
+    <a class="brand" href="{% url 'content:home' %}" style="font-size:20px;text-decoration:none;color:#0f172a"><span>the print</span><span style="color:#2563eb">planet</span>.</a>
+    <div style="border-left:1px solid #e2e8f0;height:20px;margin:0 4px"></div>
+    <div>
+      <h2 style="font:700 16px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.3px">Owner Control Hub</h2>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:14px">
+    <a href="{% url 'content:home' %}" target="_blank" class="button button-light" style="font-size:13px;padding:8px 16px;border-radius:8px">
+      View Storefront
+    </a>
+    <a href="{% url 'dashboard:product_create' %}" class="button button-dark" style="font-size:13px;padding:8px 16px;border-radius:8px;background:#2563eb">
+      Add Product
+    </a>
+    <div style="border-left:1px solid #e2e8f0;height:24px;margin:0 2px"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:50%;background:#0f172a;color:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">
+        {{ request.user.email|slice:":1"|upper|default:"A" }}
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <span style="font-size:13px;font-weight:700;color:#0f172a">{{ request.user.email|default:"Administrator" }}</span>
+        <small style="font-size:11px;color:#2563eb;font-weight:600">Staff Admin</small>
+      </div>
+    </div>
+  </div>
+</header>

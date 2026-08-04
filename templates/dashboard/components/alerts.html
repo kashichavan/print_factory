@@ -1,0 +1,31 @@
+{% comment %}
+Alert & Flash Messages Component — The Print Planet
+{% endcomment %}
+{% if messages %}
+  <div class="dash-alerts-container" style="margin-bottom:24px">
+    {% for message in messages %}
+      <div class="glass-panel alert alert-{{ message.tags }}" style="padding:14px 20px;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;{% if message.tags == 'success' %}background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;{% elif message.tags == 'error' %}background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;{% else %}background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;{% endif %} font-weight:600;font-size:14px">
+        <span>
+          {{ message }}
+        </span>
+        <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:14px;opacity:0.7">✕</button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if form.errors %}
+  <div class="glass-panel" style="padding:18px 20px;background:#fef2f2;border:1px solid #fca5a5;margin-bottom:24px;border-radius:12px;color:#991b1b">
+    <h3 style="font-size:14px;margin:0 0 8px;font-weight:700">Please correct the following errors:</h3>
+    <ul style="margin:0;padding-left:20px;font-size:13px">
+      {% for field in form %}
+        {% for error in field.errors %}
+          <li><b>{{ field.label }}:</b> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

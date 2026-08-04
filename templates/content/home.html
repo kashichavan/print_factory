@@ -1,89 +1,71 @@
 {% extends 'base.html' %}{% load static %}
 {% block content %}
-<!-- 1. Vistaprint Storefront Hero -->
+<!-- Storefront Hero Section -->
 <section class="vp-hero">
   <div class="wrap vp-hero-inner">
     <div class="vp-hero-copy">
-      <div class="vp-badge">✦ INDIA'S #1 CUSTOM PRINT PLATFORM</div>
+      <div class="vp-badge">CUSTOM PRINT &amp; PACKAGING PLATFORM</div>
       <h1>Make an unforgettable<br><em>first impression.</em></h1>
-      <p class="vp-hero-lead">Vistaprint-style business cards, custom packaging, branded apparel, signage, and corporate gifts. Crafted with precision for ambitious brands.</p>
-      
-      <!-- Quick Search / Category Pills -->
-      <div class="vp-tabs" style="margin-top:20px;margin-bottom:24px">
-        <a href="{% url 'content:business_cards' %}" class="vp-tab active">💳 Business Cards</a>
-        <a href="{% url 'content:category_detail' 'packaging' %}" class="vp-tab">📦 Packaging</a>
-        <a href="{% url 'content:category_detail' 'apparel' %}" class="vp-tab">👕 Apparel</a>
-        <a href="{% url 'content:category_detail' 'gifting' %}" class="vp-tab">🎁 Corporate Gifts</a>
-      </div>
+      <p class="vp-hero-lead">Enterprise business cards, custom packaging, branded apparel, signage, and corporate merchandise. Engineered for modern brands.</p>
 
       <div class="vp-trust-pills">
-        <span class="vp-pill">✓ 100% Quality Guarantee</span>
-        <span class="vp-pill">⚡ 24hr Express Dispatch</span>
-        <span class="vp-pill">🎨 Pantone Color Match</span>
-        <span class="vp-pill">★ 4.9/5 (500+ Verified Reviews)</span>
+        <span class="vp-pill">100% Quality Guarantee</span>
+        <span class="vp-pill">24hr Express Dispatch</span>
+        <span class="vp-pill">Pantone Color Match</span>
+        <span class="vp-pill">4.9/5 Rating (500+ Reviews)</span>
       </div>
     </div>
 
     <div class="vp-hero-art">
-      <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Vistaprint Style Premium Stationery & Business Cards">
+      <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Stationery &amp; Business Cards">
     </div>
   </div>
 </section>
 
-<!-- 2. Main Storefront Categories (Compact 6 Grid Tiles) -->
-<section class="wrap section category-storefront" style="padding-top:50px;padding-bottom:50px">
-  <div class="section-head">
+<!-- Full Shop Catalog Integrated Directly on Home Page -->
+<section class="wrap section" style="padding-top:50px;padding-bottom:60px" id="catalog-section">
+  <div class="section-head" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div>
-      <p class="eyebrow">STOREFRONT CATEGORIES</p>
-      <h2>Explore Custom Products</h2>
+      <p class="eyebrow">FULL STOREFRONT CATALOG</p>
+      <h2 style="font:700 32px 'Fraunces', serif;margin:0;color:#0f172a">Explore Custom Products</h2>
     </div>
-    <a class="text-link" href="{% url 'content:shop' %}">View Full Catalogue <span>→</span></a>
   </div>
 
-  <div class="category-grid-6">
-    {% for cat in categories %}
-    <a href="{% url 'content:category_detail' cat.slug %}" class="cat-tile-card">
-      <div class="cat-tile-icon">{{ cat.icon }}</div>
-      <div class="cat-tile-body">
-        <h3>{{ cat.name }}</h3>
-        <p>{{ cat.description|truncatewords:6 }}</p>
-        <span class="cat-tile-badge">{{ cat.badge|default:"Browse ↗" }}</span>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</section>
-
-<!-- 3. Featured Bestsellers (Compact 4-Column Product Grid) -->
-<section class="wrap section" style="padding-bottom:60px">
-  <div class="section-head">
-    <div>
-      <p class="eyebrow">BESTSELLERS &amp; POPULAR CHOICES</p>
-      <h2>Top-Rated Products</h2>
+  <!-- Category Filter Pills -->
+  <div class="vp-filter-bar" style="margin-bottom:30px;border-bottom:1px solid #e2e8f0;padding-bottom:16px">
+    <div class="vp-tabs">
+      <a href="{% url 'content:home' %}#catalog-section" class="vp-tab {% if not active_category_slug %}active{% endif %}">
+        All Categories
+      </a>
+      {% for cat in categories %}
+      <a href="?category={{ cat.slug }}#catalog-section" class="vp-tab {% if active_category_slug == cat.slug %}active{% endif %}">
+        {{ cat.name }}
+      </a>
+      {% endfor %}
     </div>
-    <a class="text-link" href="{% url 'content:shop' %}">Explore All Products <span>→</span></a>
   </div>
 
+  <!-- Product Catalog Grid -->
   <div class="vp-catalog-grid">
     {% for product in products %}
-    <article class="vp-product-card">
+    <article class="vp-product-card" style="--card-index: {{ forloop.counter0 }};">
       <a href="{% url 'content:product_detail' product.slug %}" class="vp-card-media" style="display:block">
-        <span class="vp-card-tag gold">★ {{ product.badge|default:"Bestseller" }}</span>
+        <span class="vp-card-tag">{{ product.badge|default:"Bestseller" }}</span>
         <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
       </a>
 
       <div class="vp-card-content">
-        <div class="trending-badge" style="font-size:10px;margin-bottom:4px">{{ product.category.name }}</div>
+        <div class="trending-badge" style="font-size:10px;margin-bottom:4px;color:#2563eb">{{ product.category.name }}</div>
         <h3><a href="{% url 'content:product_detail' product.slug %}" style="text-decoration:none;color:inherit">{{ product.name }}</a></h3>
         <p>{{ product.short_description|truncatewords:7 }}</p>
 
         <div class="vp-specs-summary">
-          <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews)
+          <span>Rating: {{ product.rating }}</span> ({{ product.review_count }} reviews)
         </div>
 
         <div class="vp-price-row">
           <div class="vp-price">
-            <span class="vp-from">From</span>
+            <span class="vp-from">Starting at</span>
             <strong class="vp-amount">₹{{ product.base_price }}</strong>
           </div>
           
@@ -94,50 +76,85 @@
                     '{{ product.base_price }}',
                     '{{ product.get_image_url|escapejs }}'
                   )">
-            Customise ↗
+            Customize
           </button>
         </div>
       </div>
     </article>
+    {% empty %}
+    <div class="empty-state" style="grid-column:span 4;padding:40px;text-align:center;color:#64748b">
+      <p>No products found in this category.</p>
+    </div>
     {% endfor %}
   </div>
+
+  <!-- Proper Enterprise Pagination Controls -->
+  {% if products.has_other_pages %}
+  <div class="vp-pagination-bar" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;margin:30px 0 20px;flex-wrap:wrap;gap:12px">
+    <div style="font-size:13px;color:#64748b;font-weight:500">
+      Showing <b>{{ products.start_index }}–{{ products.end_index }}</b> of <b>{{ products.paginator.count }}</b> products
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px">
+      {% if products.has_previous %}
+        <a href="?page={{ products.previous_page_number }}{% if active_category_slug %}&amp;category={{ active_category_slug }}{% endif %}#catalog-section" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+          Previous
+        </a>
+      {% endif %}
+
+      {% for i in products.paginator.page_range %}
+        {% if products.number == i %}
+          <span class="vp-tab active" style="padding:6px 14px;font-size:13px;border-radius:8px;background:#2563eb;color:#ffffff;border-color:#2563eb">{{ i }}</span>
+        {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
+          <a href="?page={{ i }}{% if active_category_slug %}&amp;category={{ active_category_slug }}{% endif %}#catalog-section" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+            {{ i }}
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      {% if products.has_next %}
+        <a href="?page={{ products.next_page_number }}{% if active_category_slug %}&amp;category={{ active_category_slug }}{% endif %}#catalog-section" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+          Next
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 </section>
 
-<!-- 4. Trending Spotlight Bento Section -->
-<section class="trending-section" style="padding-top:60px;padding-bottom:60px">
+<!-- Spotlight Bento Section -->
+<section class="trending-section" style="padding-top:40px;padding-bottom:60px">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
       <div>
         <p class="eyebrow">CURATED SPOTLIGHT</p>
-        <h2>Trending Packaging &amp; Merch</h2>
+        <h2 style="font:700 28px 'Fraunces', serif;margin:0">Trending Packaging &amp; Merch</h2>
       </div>
-      <a class="text-link" href="{% url 'content:services' %}">All Production Capabilities <span>→</span></a>
+      <a class="text-link" href="{% url 'content:services' %}">All Production Capabilities</a>
     </div>
 
     <div class="bento-grid">
-      <!-- Spotlight 1: Metallic Foil Cards -->
       <a href="{% url 'content:business_cards' %}" class="trending-card-link bento-col-6">
         <div class="trending-card-image" style="height:220px">
           <img src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Metallic Foil Business Cards">
         </div>
         <div class="trending-card-body">
-          <div class="trending-badge">✦ METALLIC FOIL SPOTLIGHT</div>
+          <div class="trending-badge">METALLIC FOIL SPOTLIGHT</div>
           <h3>Foil Embossed Luxury Stationery</h3>
           <p>3D metallic gold and silver foil accents on velvet touch 400gsm cotton cards.</p>
-          <div class="trending-card-action">Browse Metallic Cards <span>↗</span></div>
+          <div class="trending-card-action">Browse Metallic Cards</div>
         </div>
       </a>
 
-      <!-- Spotlight 2: Eco Packaging -->
       <a href="{% url 'content:category_detail' 'packaging' %}" class="trending-card-link bento-col-6">
         <div class="trending-card-image" style="height:220px">
           <img src="{% static 'images/trending-packaging-perspective.jpg' %}" alt="Eco Packaging">
         </div>
         <div class="trending-card-body">
-          <div class="trending-badge">✦ PACKAGING TREND</div>
+          <div class="trending-badge">PACKAGING TREND</div>
           <h3>Eco Matte Black Packaging</h3>
           <p>Recyclable rigid mailers and custom shipping boxes with metallic accents.</p>
-          <div class="trending-card-action">Explore Custom Packaging <span>↗</span></div>
+          <div class="trending-card-action">Explore Custom Packaging</div>
         </div>
       </a>
     </div>
@@ -149,8 +166,8 @@
   <div class="vp-modal-box">
     <button class="vp-modal-close" onclick="closeHomeModal()">✕</button>
     <div class="vp-modal-header">
-      <h2 id="home-modal-product-name">Customise Product</h2>
-      <p>Select volume discount quantity tier and custom options.</p>
+      <h2 id="home-modal-product-name">Customize Product</h2>
+      <p>Select volume discount quantity tier and options.</p>
     </div>
     <div class="vp-modal-body">
       <div class="vp-modal-preview">
@@ -173,7 +190,7 @@
         <span>Calculated Subtotal:</span>
         <strong id="home-modal-calc-price">₹190.00</strong>
       </div>
-      <button type="button" class="vp-btn-add-cart" onclick="submitHomeAddToCart()">Add to Cart 🛒</button>
+      <button type="button" class="vp-btn-add-cart" onclick="submitHomeAddToCart()">Add to Cart</button>
     </div>
   </div>
 </div>

@@ -1,0 +1,60 @@
+{% comment %}
+Dynamic Volume Price Tier Builder Component — The Print Planet
+{% endcomment %}
+<div class="glass-panel" style="padding:28px;background:#ffffff;margin-bottom:28px;border-radius:14px;border:1px solid #e2e8f0">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <h2 style="font:700 20px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.3px">Step 5: Volume Discount Tiers</h2>
+      <p style="margin:4px 0 0;font-size:13px;color:#64748b">Set bulk volume quantity discounts for enterprise ordering.</p>
+    </div>
+    <button type="button" class="button button-light" onclick="addTierRow()" style="border-radius:8px;font-size:13px">Add Volume Tier</button>
+  </div>
+
+  <div id="dynamic-tiers-list">
+    {% if product and product.price_rules.exists %}
+      {% for rule in product.price_rules.all %}
+      <div class="tier-row glass-panel" style="padding:16px;background:#f8fafc;margin-bottom:12px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
+          <label>
+            <b>Minimum Quantity Tier</b>
+            <input type="number" name="tier_min_qty[]" value="{{ rule.minimum_quantity }}">
+          </label>
+          <label>
+            <b>Tier Subtotal (₹)</b>
+            <input type="number" step="0.01" name="tier_unit_price[]" value="{{ rule.unit_price }}">
+          </label>
+          <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove</button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="tier-row glass-panel" style="padding:16px;background:#f8fafc;margin-bottom:12px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
+          <label>
+            <b>Minimum Quantity Tier</b>
+            <input type="number" name="tier_min_qty[]" value="100" placeholder="100">
+          </label>
+          <label>
+            <b>Tier Subtotal (₹)</b>
+            <input type="number" step="0.01" name="tier_unit_price[]" value="190.00" placeholder="190.00">
+          </label>
+          <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove</button>
+        </div>
+      </div>
+
+      <div class="tier-row glass-panel" style="padding:16px;background:#f8fafc;margin-bottom:12px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
+          <label>
+            <b>Minimum Quantity Tier</b>
+            <input type="number" name="tier_min_qty[]" value="250" placeholder="250">
+          </label>
+          <label>
+            <b>Tier Subtotal (₹)</b>
+            <input type="number" step="0.01" name="tier_unit_price[]" value="380.00" placeholder="380.00">
+          </label>
+          <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove</button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>

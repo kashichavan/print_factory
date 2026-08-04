@@ -9,7 +9,7 @@ class Category(PublishableModel):
     parent = models.ForeignKey("self", on_delete=models.SET_NULL, blank=True, null=True, related_name="children")
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to="catalog/categories/", blank=True, null=True)
-    icon = models.CharField(max_length=50, blank=True, default="✦")
+    icon = models.CharField(max_length=50, blank=True, default="")
     badge = models.CharField(max_length=50, blank=True)
 
     class Meta:
@@ -46,6 +46,37 @@ class Product(PublishableModel):
 
     def __str__(self):
         return self.name
+
+    def calculate_total_price(self, quantity=100, option_value_ids=None):
+        """
+        Calculates subtotal based on active volume PriceRules and OptionValue price modifiers.
+        Follows SaaS tier-based dynamic pricing principles.
+        """
+        try:
+            quantity = max(1, int(quantity))
+        except (ValueError, TypeError):
+            quantity = 100
+
+        matching_rule = self.price_rules.filter(is_active=True, minimum_quantity__lte=quantity).order_by("-minimum_quantity").first()
+        if matching_rule and matching_rule.unit_price:
+            subtotal = matching_rule.unit_price
+        else:
+            if quantity >= 1000:
+                mult = Decimal("5.8")
+            elif quantity >= 500:
+                mult = Decimal("3.6")
+            elif quantity >= 250:
+                mult = Decimal("2.1")
+            else:
+                mult = Decimal("1.0")
+            subtotal = self.base_price * mult
+
+        if option_value_ids:
+            mods = OptionValue.objects.filter(id__in=option_value_ids).aggregate(total_mod=models.Sum("price_modifier"))["total_mod"]
+            if mods:
+                subtotal += mods
+
+        return subtotal.quantize(Decimal("0.01"))
 
     @property
     def get_image_url(self):

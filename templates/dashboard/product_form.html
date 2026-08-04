@@ -3,66 +3,50 @@
 {% block title %}{{ title|default:"Add Product" }} | Owner Dashboard{% endblock %}
 
 {% block dashboard_content %}
-<div class="dash-heading">
+<div class="dash-heading" style="margin-bottom:24px">
   <div>
-    <p class="eyebrow">DYNAMIC CATALOG EDITOR</p>
-    <h1>{{ title|default:"Add Custom Product" }}</h1>
-    <p class="dash-copy">Follow the step-by-step wizard below to configure category, product type, base details, dynamic options, and volume pricing tiers.</p>
+    <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">CATALOG BUILDER</p>
+    <h1 style="font:700 28px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.4px">{{ title|default:"Add Product" }}</h1>
+    <p style="margin:4px 0 0;font-size:13px;color:#64748b">Configure category, product details, dynamic options, and volume pricing tiers.</p>
   </div>
 </div>
-
-{% if form.errors %}
-<div class="glass-panel" style="padding:20px;background:#fef2f2;border:1px solid #fca5a5;margin-bottom:24px;border-radius:16px;color:#991b1b">
-  <h3 style="font-size:16px;margin:0 0 8px;font-weight:700">⚠️ Please correct the following errors:</h3>
-  <ul style="margin:0;padding-left:20px;font-size:14px">
-    {% for field in form %}
-      {% for error in field.errors %}
-        <li><b>{{ field.label }}:</b> {{ error }}</li>
-      {% endfor %}
-    {% endfor %}
-    {% for error in form.non_field_errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-</div>
-{% endif %}
 
 <form method="post" enctype="multipart/form-data" class="dash-dynamic-form">
   {% csrf_token %}
 
   <!-- Step 1 & 2: Category & Product Type Selection -->
-  <div class="glass-panel" style="padding:30px;background:#ffffff;margin-bottom:30px">
+  <div class="glass-panel" style="padding:28px;background:#ffffff;margin-bottom:28px;border-radius:14px;border:1px solid #e2e8f0">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <h2 style="font:700 24px Fraunces,serif;margin:0">Step 1 &amp; 2: Category &amp; Product Type</h2>
-      <a href="{% url 'dashboard:category_create' %}" class="button button-light" style="font-size:13px">+ Create New Category</a>
+      <h2 style="font:700 20px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a">Step 1 &amp; 2: Category &amp; Product Type</h2>
+      <a href="{% url 'dashboard:category_create' %}" class="button button-light" style="font-size:13px;border-radius:8px">Create New Category</a>
     </div>
 
     <div class="dash-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <label>
-        <b>Select Database Category *</b>
+        <b>Select Category *</b>
         {{ form.category }}
-        <small style="color:var(--muted);margin-top:4px">Only active categories present in database are listed.</small>
+        <small style="color:#64748b;margin-top:4px">Only active categories present in database are listed.</small>
       </label>
 
       <label>
         <b>Product Type *</b>
         {{ form.product_type }}
-        <small style="color:var(--muted);margin-top:4px">Select production category style.</small>
+        <small style="color:#64748b;margin-top:4px">Select production category style.</small>
       </label>
 
-      <label style="grid-column:span 2;display:flex;flex-direction:row;align-items:center;gap:12px;cursor:pointer">
-        <input type="checkbox" name="is_active" style="width:20px;height:20px" {% if form.is_active.value or not product %}checked{% endif %}>
+      <label style="grid-column:span 2;display:flex;flex-direction:row;align-items:center;gap:12px;cursor:pointer;margin-top:8px">
+        <input type="checkbox" name="is_active" style="width:18px;height:18px" {% if form.is_active.value or not product %}checked{% endif %}>
         <div>
-          <b style="font-size:15px">Publish Live on Storefront Immediately (Active)</b>
-          <small style="color:var(--muted);display:block">Uncheck if you wish to save this product as an offline draft.</small>
+          <b style="font-size:14px;color:#0f172a">Publish Live on Storefront Immediately</b>
+          <small style="color:#64748b;display:block;font-weight:400">Uncheck to save as offline draft.</small>
         </div>
       </label>
     </div>
   </div>
 
   <!-- Step 3: Base Details & Media Image Upload -->
-  <div class="glass-panel" style="padding:30px;background:#ffffff;margin-bottom:30px">
-    <h2 style="font:700 24px Fraunces,serif;margin:0 0 20px">Step 3: Basic Details &amp; Image Upload</h2>
+  <div class="glass-panel" style="padding:28px;background:#ffffff;margin-bottom:28px;border-radius:14px;border:1px solid #e2e8f0">
+    <h2 style="font:700 20px 'Plus Jakarta Sans', sans-serif;margin:0 0 20px;color:#0f172a">Step 3: Basic Details &amp; Image Upload</h2>
 
     <div class="dash-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <label>
@@ -76,25 +60,25 @@
       </label>
 
       <label style="grid-column:span 2">
-        <b>Badge Pill Tag (Optional)</b>
-        <input type="text" name="badge" placeholder="e.g. Bestseller / 3D Foil / 100% Recycled" value="{% if form.badge.value %}{{ form.badge.value }}{% elif product %}{{ product.badge }}{% else %}Bestseller{% endif %}">
+        <b>Badge Tag (Optional)</b>
+        <input type="text" name="badge" placeholder="e.g. Bestseller / Custom Spec" value="{% if form.badge.value %}{{ form.badge.value }}{% elif product %}{{ product.badge }}{% else %}Bestseller{% endif %}">
       </label>
 
       <label style="grid-column:span 2">
-        <b>Product Media Image Upload</b>
+        <b>Product Image Upload</b>
         <input type="file" name="image" accept="image/*" class="vp-file-input">
         {% if product and product.get_image_url %}
           <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
-            <img src="{{ product.get_image_url }}" alt="Current Image" style="width:60px;height:50px;object-fit:cover;border-radius:8px;border:1px solid #1e223020">
-            <span style="font-size:13px;color:#059669;font-weight:700">✓ Current image stored in DB</span>
+            <img src="{{ product.get_image_url }}" alt="Current Image" style="width:60px;height:50px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0">
+            <span style="font-size:13px;color:#2563eb;font-weight:700">Current image saved</span>
           </div>
         {% else %}
-          <small style="color:var(--muted);margin-top:4px;display:block">Upload photo or high-res perspective mockup (JPG, PNG, WEBP)</small>
+          <small style="color:#64748b;margin-top:4px;display:block">Upload product photo or high-res mockup (JPG, PNG, WEBP)</small>
         {% endif %}
       </label>
 
       <label style="grid-column:span 2">
-        <b>Short Pitch / Card Summary</b>
+        <b>Short Pitch / Summary</b>
         <input type="text" name="short_description" placeholder="e.g. 3D elevated gold or silver foil accents on velvety 400gsm cardstock." value="{% if form.short_description.value %}{{ form.short_description.value }}{% elif product %}{{ product.short_description }}{% endif %}">
       </label>
 
@@ -105,129 +89,14 @@
     </div>
   </div>
 
-  <!-- Step 4: Dynamic Options Builder (Sizes, Materials, Finishes) -->
-  <div class="glass-panel" style="padding:30px;background:#ffffff;margin-bottom:30px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div>
-        <h2 style="font:700 24px Fraunces,serif;margin:0">Step 4: Dynamic Size &amp; Material Options</h2>
-        <p style="margin:4px 0 0;font-size:13px;color:var(--muted)">Define customizable options for size, paper stock, fabric, or corner shape with price additions.</p>
-      </div>
-      <button type="button" class="button button-light" onclick="addOptionRow()">+ Add Custom Option</button>
-    </div>
-
-    <div id="dynamic-options-list">
-      {% if product and product.options.exists %}
-        {% for option in product.options.all %}
-        <div class="dyn-row glass-panel" style="padding:20px;background:#f8f6f2;margin-bottom:16px">
-          <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
-            <label>
-              <b>Option Name</b>
-              <input type="text" name="dyn_option_name[]" value="{{ option.name }}">
-            </label>
-            <label>
-              <b>Option Values (Label:PriceModifier)</b>
-              <input type="text" name="dyn_option_values[]" value="{% for v in option.values.all %}{{ v.label }}:{{ v.price_modifier }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-            </label>
-            <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove ✕</button>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <!-- Default Sample Option 1 -->
-        <div class="dyn-row glass-panel" style="padding:20px;background:#f8f6f2;margin-bottom:16px">
-          <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
-            <label>
-              <b>Option Name (e.g. Size / Paper)</b>
-              <input type="text" name="dyn_option_name[]" value="Paper Stock &amp; Finish" placeholder="e.g. Size or Material">
-            </label>
-            <label>
-              <b>Comma-Separated Option Values with Price Modifiers (Label:Price)</b>
-              <input type="text" name="dyn_option_values[]" value="Standard Matte (300gsm):0, Premium Glossy (350gsm):40, Metallic Gold Foil:200" placeholder="Label:PriceAdd, Label2:PriceAdd2">
-            </label>
-            <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove ✕</button>
-          </div>
-          <small style="color:var(--muted);margin-top:6px;display:block">Syntax Example: <code>Matte 300gsm:0, Glossy 350gsm:40, Gold Foil:200</code></small>
-        </div>
-
-        <!-- Default Sample Option 2 -->
-        <div class="dyn-row glass-panel" style="padding:20px;background:#f8f6f2;margin-bottom:16px">
-          <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
-            <label>
-              <b>Option Name</b>
-              <input type="text" name="dyn_option_name[]" value="Corner Style" placeholder="e.g. Corner Shape">
-            </label>
-            <label>
-              <b>Option Values</b>
-              <input type="text" name="dyn_option_values[]" value="Standard Square:0, 4 Rounded Corners:50" placeholder="Label:PriceAdd">
-            </label>
-            <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove ✕</button>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
+  <!-- Step 4: Dynamic Options Builder -->
+  {% include 'dashboard/components/option_builder.html' %}
 
   <!-- Step 5: Dynamic Quantity Bulk Volume Pricing Tiers -->
-  <div class="glass-panel" style="padding:30px;background:#ffffff;margin-bottom:30px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div>
-        <h2 style="font:700 24px Fraunces,serif;margin:0">Step 5: Volume Quantity Discount Tiers</h2>
-        <p style="margin:4px 0 0;font-size:13px;color:var(--muted)">Set bulk volume quantity discounts (Flipkart / Amazon style tier pricing).</p>
-      </div>
-      <button type="button" class="button button-light" onclick="addTierRow()">+ Add Volume Tier</button>
-    </div>
+  {% include 'dashboard/components/price_tier_builder.html' %}
 
-    <div id="dynamic-tiers-list">
-      {% if product and product.price_rules.exists %}
-        {% for rule in product.price_rules.all %}
-        <div class="tier-row glass-panel" style="padding:16px;background:#f8f6f2;margin-bottom:12px">
-          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
-            <label>
-              <b>Minimum Quantity Tier</b>
-              <input type="number" name="tier_min_qty[]" value="{{ rule.minimum_quantity }}">
-            </label>
-            <label>
-              <b>Tier Subtotal (₹)</b>
-              <input type="number" step="0.01" name="tier_unit_price[]" value="{{ rule.unit_price }}">
-            </label>
-            <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove ✕</button>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="tier-row glass-panel" style="padding:16px;background:#f8f6f2;margin-bottom:12px">
-          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
-            <label>
-              <b>Minimum Quantity Tier</b>
-              <input type="number" name="tier_min_qty[]" value="100" placeholder="100">
-            </label>
-            <label>
-              <b>Tier Subtotal (₹)</b>
-              <input type="number" step="0.01" name="tier_unit_price[]" value="190.00" placeholder="190.00">
-            </label>
-            <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove ✕</button>
-          </div>
-        </div>
-
-        <div class="tier-row glass-panel" style="padding:16px;background:#f8f6f2;margin-bottom:12px">
-          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
-            <label>
-              <b>Minimum Quantity Tier</b>
-              <input type="number" name="tier_min_qty[]" value="250" placeholder="250">
-            </label>
-            <label>
-              <b>Tier Subtotal (₹)</b>
-              <input type="number" step="0.01" name="tier_unit_price[]" value="380.00" placeholder="380.00">
-            </label>
-            <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove ✕</button>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div style="display:flex;gap:16px;align-items:center">
-    <button type="submit" class="button button-dark" style="padding:16px 36px;font-size:16px">Save Product &amp; Update Catalogue 🚀</button>
+  <div style="display:flex;gap:16px;align-items:center;margin-top:20px">
+    <button type="submit" class="button button-dark" style="padding:14px 32px;font-size:15px;border-radius:8px;background:#2563eb">Save Product</button>
     <a href="{% url 'dashboard:product_list' %}" class="text-link">Cancel</a>
   </div>
 </form>
@@ -237,18 +106,18 @@ function addOptionRow() {
   const container = document.getElementById('dynamic-options-list');
   const div = document.createElement('div');
   div.className = 'dyn-row glass-panel';
-  div.style.cssText = 'padding:20px;background:#f8f6f2;margin-bottom:16px';
+  div.style.cssText = 'padding:18px;background:#f8fafc;margin-bottom:14px;border-radius:10px;border:1px solid #e2e8f0';
   div.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
       <label>
-        <b>Option Name (e.g. Size / Material / Color)</b>
+        <b>Option Name</b>
         <input type="text" name="dyn_option_name[]" placeholder="e.g. Size Tier">
       </label>
       <label>
         <b>Option Values (Label:PriceModifier)</b>
         <input type="text" name="dyn_option_values[]" placeholder="Small (6x4 in):0, Medium (9x6 in):50, Large (12x9 in):100">
       </label>
-      <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove ✕</button>
+      <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove</button>
     </div>
   `;
   container.appendChild(div);
@@ -258,7 +127,7 @@ function addTierRow() {
   const container = document.getElementById('dynamic-tiers-list');
   const div = document.createElement('div');
   div.className = 'tier-row glass-panel';
-  div.style.cssText = 'padding:16px;background:#f8f6f2;margin-bottom:12px';
+  div.style.cssText = 'padding:16px;background:#f8fafc;margin-bottom:12px;border-radius:10px;border:1px solid #e2e8f0';
   div.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center">
       <label>
@@ -269,7 +138,7 @@ function addTierRow() {
         <b>Tier Subtotal (₹)</b>
         <input type="number" step="0.01" name="tier_unit_price[]" placeholder="1100.00">
       </label>
-      <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove ✕</button>
+      <button type="button" class="cart-remove-btn" onclick="this.closest('.tier-row').remove()">Remove</button>
     </div>
   `;
   container.appendChild(div);

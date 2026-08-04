@@ -1,66 +1,65 @@
-{% extends 'base.html' %}
-{% block title %}Manage Services | Owner Command Center{% endblock %}
+{% extends 'dashboard/base.html' %}
+{% block title %}Manage Services | Owner Dashboard{% endblock %}
 
-{% block content %}
-<div class="wrap dashboard">
-  <aside class="side">
-    <p class="dash-mark">OWNER COMMAND</p>
-    <a href="{% url 'dashboard:home' %}" class="dash-nav-item">📊 Overview</a>
-    <a href="{% url 'dashboard:product_list' %}" class="dash-nav-item">📦 Products Catalogue</a>
-    <a href="{% url 'dashboard:service_list' %}" class="dash-nav-item active" style="font-weight:800;color:var(--orange)">🛠️ Production Services</a>
-    <a href="{% url 'dashboard:order_list' %}" class="dash-nav-item">🛒 Orders &amp; Proofing</a>
-    <a href="{% url 'dashboard:lead_list' %}" class="dash-nav-item">📬 Leads &amp; Enquiries</a>
-  </aside>
+{% block dashboard_content %}
+<div class="dash-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+  <div>
+    <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">SERVICES MANAGEMENT</p>
+    <h1 style="font:700 28px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.4px">Production Services</h1>
+  </div>
+  <a href="{% url 'dashboard:service_create' %}" class="button button-dark" style="padding:10px 18px;border-radius:8px;background:#2563eb">Add New Service</a>
+</div>
 
-  <main class="dash-content">
-    <div class="dash-heading">
-      <div>
-        <p class="eyebrow" style="margin:0 0 4px">DATABASE CONTROL</p>
-        <h1>Production Services</h1>
-      </div>
-      <a href="{% url 'dashboard:service_create' %}" class="nav-cta">+ Add New Service ↗</a>
-    </div>
-
-    <div class="glass-panel order-table">
-      <div class="table-row table-label" style="grid-template-columns: 80px 1.5fr 1fr 1fr 100px 120px">
-        <span>Image</span>
-        <span>Service Title &amp; Badge</span>
-        <span>Speed / Feature</span>
-        <span>Base Rate</span>
-        <span>Status</span>
-        <span>Actions</span>
-      </div>
-
+<div class="glass-panel" style="padding:0;overflow:hidden;border-radius:14px;background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(15,23,42,0.03)">
+  <table style="width:100%;border-collapse:collapse;text-align:left">
+    <thead>
+      <tr style="background:#eff6ff;border-bottom:1px solid #dbeafe;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:#64748b">
+        <th style="padding:14px 18px">Image</th>
+        <th style="padding:14px 18px">Service Title &amp; Badge</th>
+        <th style="padding:14px 18px">Speed / Feature</th>
+        <th style="padding:14px 18px">Base Rate</th>
+        <th style="padding:14px 18px">Status</th>
+        <th style="padding:14px 18px;text-align:right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
       {% for srv in services %}
-      <div class="table-row link-row" style="grid-template-columns: 80px 1.5fr 1fr 1fr 100px 120px">
-        <span>
-          <img src="{{ srv.get_image_url }}" alt="{{ srv.title }}" style="width:50px;height:40px;object-fit:cover;border-radius:8px">
-        </span>
-        <span>
-          <strong>{{ srv.title }}</strong>
-          <small>{{ srv.badge }}</small>
-        </span>
-        <span>{{ srv.speed_info }}</span>
-        <span><strong>₹{{ srv.base_rate }}</strong></span>
-        <span>
+      <tr style="border-bottom:1px solid #f1f5f9">
+        <td style="padding:14px 18px">
+          <img src="{{ srv.get_image_url }}" alt="{{ srv.title }}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0">
+        </td>
+        <td style="padding:14px 18px">
+          <b style="font-size:14px;color:#0f172a;display:block">{{ srv.title }}</b>
+          <small style="color:#64748b;font-size:11px">{{ srv.badge }}</small>
+        </td>
+        <td style="padding:14px 18px;font-size:13px;color:#64748b">
+          {{ srv.speed_info }}
+        </td>
+        <td style="padding:14px 18px">
+          <strong style="font-size:14px;color:#0f172a">₹{{ srv.base_rate }}</strong>
+        </td>
+        <td style="padding:14px 18px">
           {% if srv.is_active %}
-            <span class="status confirmed">ACTIVE</span>
+            <span class="status confirmed" style="font-size:11px;font-weight:700">Active</span>
           {% else %}
-            <span class="status cancelled">DRAFT</span>
+            <span class="status cancelled" style="font-size:11px;font-weight:700">Draft</span>
           {% endif %}
-        </span>
-        <span style="display:flex;gap:8px">
-          <a href="{% url 'dashboard:service_edit' srv.id %}" style="padding:4px 10px;background:#1e223010;border-radius:8px;font-size:12px;font-weight:700">Edit</a>
-          <a href="{% url 'dashboard:service_delete' srv.id %}" style="padding:4px 10px;background:#fee2e2;color:#991b1b;border-radius:8px;font-size:12px;font-weight:700">Delete</a>
-        </span>
-      </div>
+        </td>
+        <td style="padding:14px 18px;text-align:right">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+            <a href="{% url 'dashboard:service_edit' srv.id %}" class="button button-dark" style="padding:5px 10px;font-size:12px;border-radius:6px;background:#2563eb">Edit</a>
+            <a href="{% url 'dashboard:service_delete' srv.id %}" class="button button-light" style="padding:5px 10px;font-size:12px;border-radius:6px;color:#dc2626;border-color:#fca5a5;background:#ffffff">Delete</a>
+          </div>
+        </td>
+      </tr>
       {% empty %}
-      <div style="padding:40px;text-align:center;color:var(--muted)">
-        <p>No production services found in database.</p>
-        <a href="{% url 'dashboard:service_create' %}" class="nav-cta">+ Add First Service</a>
-      </div>
+      <tr>
+        <td colspan="6" style="padding:40px;text-align:center;color:#64748b">
+          No production services found in database.
+        </td>
+      </tr>
       {% endfor %}
-    </div>
-  </main>
+    </tbody>
+  </table>
 </div>
 {% endblock %}

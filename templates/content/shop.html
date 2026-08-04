@@ -1,43 +1,43 @@
 {% extends 'base.html' %}{% load static %}
-{% block title %}Full Catalog | Vistaprint Storefront | The Print Planet{% endblock %}
+{% block title %}Full Catalog | Custom Printing | The Print Planet{% endblock %}
 
 {% block content %}
-<section class="page-hero wrap">
-  <p class="eyebrow">VISTAPRINT CATALOGUE</p>
-  <h1>Made for your<br><em>brand.</em></h1>
-  <p class="lead">Browse our complete collection of business cards, packaging, apparel, signage, and corporate gifts.</p>
+<section class="page-hero wrap" style="padding-top:40px;padding-bottom:30px">
+  <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">FULL CATALOG</p>
+  <h1 style="font:700 clamp(32px, 4vw, 52px)/1.05 'Fraunces', serif;letter-spacing:-1px;margin:0 0 10px;color:#0f172a">Custom Print Catalog</h1>
+  <p class="lead" style="margin:0;font-size:15px;color:#64748b">Browse business cards, packaging, apparel, signage, and corporate merchandise.</p>
 </section>
 
 <!-- Category Filter Pills -->
-<section class="wrap vp-filter-bar">
+<section class="wrap vp-filter-bar" style="border-bottom:1px solid #e2e8f0;margin-bottom:30px">
   <div class="vp-tabs">
     <a href="{% url 'content:shop' %}" class="vp-tab {% if not active_category_slug %}active{% endif %}">
-      ✦ All Categories
+      All Categories
     </a>
     {% for cat in categories %}
     <a href="{% url 'content:category_detail' cat.slug %}" class="vp-tab {% if active_category_slug == cat.slug %}active{% endif %}">
-      {{ cat.icon }} {{ cat.name }}
+      {{ cat.name }}
     </a>
     {% endfor %}
   </div>
 </section>
 
-<!-- Vistaprint Catalogue Product Grid -->
+<!-- Catalogue Product Grid -->
 <section class="wrap vp-catalog-grid">
   {% for product in products %}
   <article class="vp-product-card">
     <a href="{% url 'content:product_detail' product.slug %}" class="vp-card-media" style="display:block">
-      <span class="vp-card-tag gold">★ {{ product.badge|default:"Bestseller" }}</span>
+      <span class="vp-card-tag">{{ product.badge|default:"Bestseller" }}</span>
       <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
     </a>
 
     <div class="vp-card-content">
-      <div class="trending-badge" style="font-size:10px;margin-bottom:6px">{{ product.category.name }}</div>
+      <div class="trending-badge" style="font-size:10px;margin-bottom:6px;color:#2563eb">{{ product.category.name }}</div>
       <h3><a href="{% url 'content:product_detail' product.slug %}" style="text-decoration:none;color:inherit">{{ product.name }}</a></h3>
       <p>{{ product.short_description }}</p>
 
       <div class="vp-specs-summary">
-        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>Fast Dispatch</span>
+        <span>Rating: {{ product.rating }}</span> ({{ product.review_count }} reviews)
       </div>
 
       <div class="vp-price-row">
@@ -51,9 +51,9 @@
                   '{{ product.id }}', 
                   '{{ product.name|escapejs }}', 
                   '{{ product.base_price }}',
-                  '{% static product.get_image_url %}'
+                  '{{ product.get_image_url|escapejs }}'
                 )">
-          Customise &amp; Buy ↗
+          Customize
         </button>
       </div>
     </div>
@@ -63,28 +63,43 @@
 
 <!-- Storefront Pagination Bar -->
 {% if products.has_other_pages %}
-<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 60px">
-  {% if products.has_previous %}
-    <a href="?page={{ products.previous_page_number }}&amp;category={{ active_category_slug }}" class="vp-tab">← Previous</a>
-  {% endif %}
+<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;margin:30px 0 60px;flex-wrap:wrap;gap:12px">
+  <div style="font-size:13px;color:#64748b;font-weight:500">
+    Showing <b>{{ products.start_index }}–{{ products.end_index }}</b> of <b>{{ products.paginator.count }}</b> products
+  </div>
 
-  <span style="font-size:13px;font-weight:700;color:var(--ink)">
-    Page {{ products.number }} of {{ products.paginator.num_pages }}
-  </span>
+  <div style="display:flex;align-items:center;gap:6px">
+    {% if products.has_previous %}
+      <a href="?page={{ products.previous_page_number }}{% if active_category_slug %}&amp;category={{ active_category_slug }}{% endif %}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+        Previous
+      </a>
+    {% endif %}
 
-  {% if products.has_next %}
-    <a href="?page={{ products.next_page_number }}&amp;category={{ active_category_slug }}" class="vp-tab">Next →</a>
-  {% endif %}
+    {% for i in products.paginator.page_range %}
+      {% if products.number == i %}
+        <span class="vp-tab active" style="padding:6px 14px;font-size:13px;border-radius:8px;background:#2563eb;color:#ffffff;border-color:#2563eb">{{ i }}</span>
+      {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
+        <a href="?page={{ i }}{% if active_category_slug %}&amp;category={{ active_category_slug }}{% endif %}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+          {{ i }}
+        </a>
+      {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+      <a href="?page={{ products.next_page_number }}{% if active_category_slug %}&amp;category={{ active_category_slug }}{% endif %}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+        Next
+      </a>
+    {% endif %}
+  </div>
 </div>
 {% endif %}
-
 
 <!-- Shop Modal -->
 <div id="shop-modal" class="vp-modal-overlay">
   <div class="vp-modal-box">
     <button class="vp-modal-close" onclick="closeShopModal()">✕</button>
     <div class="vp-modal-header">
-      <h2 id="shop-modal-product-name">Customise Product</h2>
+      <h2 id="shop-modal-product-name">Customize Product</h2>
       <p>Select specs and instant volume discount tier.</p>
     </div>
     <div class="vp-modal-body">
@@ -93,7 +108,7 @@
       </div>
       <div class="vp-modal-form">
         <div class="vp-form-group">
-          <label>1. Select Quantity</label>
+          <label>Select Quantity</label>
           <div class="vp-qty-grid">
             <button type="button" class="vp-qty-btn active" data-qty="10" data-mult="1.0" onclick="selectShopQty(this)"><b>10</b><span>Sample</span></button>
             <button type="button" class="vp-qty-btn" data-qty="50" data-mult="4.2" onclick="selectShopQty(this)"><b>50</b><span class="save-tag">Save 15%</span></button>
@@ -108,7 +123,7 @@
         <span>Calculated Subtotal:</span>
         <strong id="shop-modal-calc-price">₹190.00</strong>
       </div>
-      <button type="button" class="vp-btn-add-cart" onclick="submitShopAddToCart()">Add to Cart 🛒</button>
+      <button type="button" class="vp-btn-add-cart" onclick="submitShopAddToCart()">Add to Cart</button>
     </div>
   </div>
 </div>

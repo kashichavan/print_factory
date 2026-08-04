@@ -1,20 +1,20 @@
 {% extends 'base.html' %}{% load static %}
-{% block title %}{{ category.name }} | Vistaprint Storefront | The Print Planet{% endblock %}
+{% block title %}{{ category.name }} | Category | The Print Planet{% endblock %}
 
 {% block content %}
 <!-- Category Hero Banner -->
 <section class="vp-hero">
   <div class="wrap vp-hero-inner">
     <div class="vp-hero-copy">
-      <div class="vp-badge">{{ category.icon }} {{ category.badge|default:"VISTAPRINT QUALITY" }}</div>
+      <div class="vp-badge">{{ category.badge|default:"PRINT PLATFORM" }}</div>
       <h1>{{ category.name }}</h1>
       <p class="vp-hero-lead">{{ category.description }}</p>
       
       <div class="vp-trust-pills">
-        <span class="vp-pill">✓ 100% Satisfaction Guarantee</span>
-        <span class="vp-pill">✓ Instant Bulk Volume Tiers</span>
-        <span class="vp-pill">✓ Custom Logo &amp; Artwork Upload</span>
-        <span class="vp-pill">★ 4.9/5 Star Rated</span>
+        <span class="vp-pill">100% Satisfaction Guarantee</span>
+        <span class="vp-pill">Instant Bulk Volume Tiers</span>
+        <span class="vp-pill">Custom Logo Upload</span>
+        <span class="vp-pill">4.9/5 Rating</span>
       </div>
     </div>
     <div class="vp-hero-art">
@@ -37,12 +37,12 @@
   </div>
 </section>
 
-<!-- Category Selector Bar (Live Dynamic DB Categories) -->
+<!-- Category Selector Bar -->
 <section class="wrap vp-filter-bar">
   <div class="vp-tabs">
     {% for cat in all_categories %}
       <a href="{% url 'content:category_detail' cat.slug %}" class="vp-tab {% if cat.slug == category.slug %}active{% endif %}">
-        {{ cat.icon }} {{ cat.name }}
+        {{ cat.name }}
       </a>
     {% endfor %}
   </div>
@@ -56,7 +56,7 @@
   {% for product in products %}
   <article class="vp-product-card">
     <a href="{% url 'content:product_detail' product.slug %}" class="vp-card-media" style="display:block">
-      <span class="vp-card-tag gold">★ {{ product.badge|default:"Bestseller" }}</span>
+      <span class="vp-card-tag">{{ product.badge|default:"Bestseller" }}</span>
       <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
     </a>
 
@@ -65,7 +65,7 @@
       <p>{{ product.short_description }}</p>
 
       <div class="vp-specs-summary">
-        <span>★ {{ product.rating }}</span> ({{ product.review_count }} reviews) · <span>Fast Express Dispatch</span>
+        <span>Rating: {{ product.rating }}</span> ({{ product.review_count }} reviews)
       </div>
 
       <div class="vp-price-row">
@@ -82,7 +82,7 @@
                   '{{ product.base_price }}',
                   '{{ product.get_image_url|escapejs }}'
                 )">
-          Customise &amp; Buy ↗
+          Customize
         </button>
       </div>
     </div>
@@ -96,18 +96,38 @@
 
 <!-- Category Pagination Bar -->
 {% if products.has_other_pages %}
-<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 60px">
-  {% if products.has_previous %}
-    <a href="?page={{ products.previous_page_number }}" class="vp-tab">← Previous</a>
-  {% endif %}
-  <span style="font-size:13px;font-weight:700;color:var(--muted)">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
-  {% if products.has_next %}
-    <a href="?page={{ products.next_page_number }}" class="vp-tab">Next →</a>
-  {% endif %}
+<div class="wrap vp-pagination-bar" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;margin:30px 0 60px;flex-wrap:wrap;gap:12px">
+  <div style="font-size:13px;color:#64748b;font-weight:500">
+    Showing <b>{{ products.start_index }}–{{ products.end_index }}</b> of <b>{{ products.paginator.count }}</b> products
+  </div>
+
+  <div style="display:flex;align-items:center;gap:6px">
+    {% if products.has_previous %}
+      <a href="?page={{ products.previous_page_number }}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+        Previous
+      </a>
+    {% endif %}
+
+    {% for i in products.paginator.page_range %}
+      {% if products.number == i %}
+        <span class="vp-tab active" style="padding:6px 14px;font-size:13px;border-radius:8px;background:#2563eb;color:#ffffff;border-color:#2563eb">{{ i }}</span>
+      {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
+        <a href="?page={{ i }}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+          {{ i }}
+        </a>
+      {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+      <a href="?page={{ products.next_page_number }}" class="vp-tab" style="padding:6px 14px;font-size:13px;border-radius:8px">
+        Next
+      </a>
+    {% endif %}
+  </div>
 </div>
 {% endif %}
 
-<!-- 100% DYNAMIC DATABASE CUSTOMIZER MODAL -->
+<!-- DYNAMIC DATABASE CUSTOMIZER MODAL -->
 <div id="category-modal" class="vp-modal-overlay">
   <div class="vp-modal-box">
     <button class="vp-modal-close" onclick="closeCategoryModal()">✕</button>
@@ -123,21 +143,21 @@
         <img id="cat-modal-img" src="{% static 'images/trending-cards-perspective.jpg' %}" alt="Product Preview">
 
         <div class="vp-file-upload-box">
-          <p><strong>Upload Ready Print Artwork</strong></p>
+          <p><strong>Upload Print Artwork</strong></p>
           <small>Supported: PDF, AI, PSD, High-Res PNG (Min 300 DPI)</small>
           <input type="file" id="cat-modal-file" class="vp-file-input" accept=".pdf,.ai,.psd,.png,.jpg">
         </div>
       </div>
 
-      <!-- Right Column: Dynamic DB Render Form Container -->
+      <!-- Right Column: Dynamic Form Container -->
       <div class="vp-modal-form" id="cat-dynamic-form-container">
-        <div style="padding:40px 0;text-align:center;color:var(--muted)">
-          <span>Loading specifications from database... ⏳</span>
+        <div style="padding:40px 0;text-align:center;color:#64748b">
+          <span>Loading specifications from database...</span>
         </div>
       </div>
     </div>
 
-    <!-- Modal Footer with Calculated Total -->
+    <!-- Modal Footer -->
     <div class="vp-modal-footer">
       <div class="vp-modal-price-calc">
         <span>Calculated Subtotal:</span>
@@ -146,7 +166,7 @@
       </div>
 
       <button type="button" id="btn-cat-add-cart" class="vp-btn-add-cart" onclick="submitCategoryAddToCart()">
-        Add to Cart 🛒
+        Add to Cart
       </button>
     </div>
   </div>
@@ -163,7 +183,7 @@ function openCategoryModal(id, name, basePrice, imgUrl) {
   document.getElementById('category-modal').classList.add('is-open');
   
   const container = document.getElementById('cat-dynamic-form-container');
-  container.innerHTML = '<div style="padding:40px 0;text-align:center;color:var(--muted)"><span>Loading specifications from database... ⏳</span></div>';
+  container.innerHTML = '<div style="padding:40px 0;text-align:center;color:#64748b"><span>Loading specifications from database...</span></div>';
 
   fetch(`/api/catalog/api/product/${id}/options/`)
     .then(r => r.json())
@@ -182,11 +202,10 @@ function renderCatDynamicForm(product) {
   const container = document.getElementById('cat-dynamic-form-container');
   container.innerHTML = '';
 
-  // 1. Render Dynamic Quantity Tiers from DB price_rules
   if (product.price_rules && product.price_rules.length > 0) {
     const qtyGroup = document.createElement('div');
     qtyGroup.className = 'vp-form-group';
-    qtyGroup.innerHTML = '<label>1. Select Quantity Tier (DB Driven)</label>';
+    qtyGroup.innerHTML = '<label>1. Select Quantity Tier</label>';
 
     const qtyGrid = document.createElement('div');
     qtyGrid.className = 'vp-qty-grid';
@@ -207,7 +226,6 @@ function renderCatDynamicForm(product) {
     container.appendChild(qtyGroup);
   }
 
-  // 2. Render Dynamic Option Chips for every ProductOption & OptionValue in DB
   if (product.options && product.options.length > 0) {
     product.options.forEach((opt, optIdx) => {
       const optGroup = document.createElement('div');
@@ -278,7 +296,7 @@ function submitCategoryAddToCart() {
 
   const btn = document.getElementById('btn-cat-add-cart');
   btn.disabled = true;
-  btn.innerText = 'Adding to Cart... ⏳';
+  btn.innerText = 'Adding to Cart...';
 
   const qtyBtn = document.querySelector('#cat-dynamic-form-container .vp-qty-btn.active');
   const qty = qtyBtn ? parseInt(qtyBtn.getAttribute('data-qty')) : 100;
@@ -309,20 +327,20 @@ function submitCategoryAddToCart() {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      btn.innerText = 'Added! ✓';
+      btn.innerText = 'Added!';
       updateCartBadge(data.cart_count);
       showToast(data.message);
       setTimeout(() => {
         closeCategoryModal();
         btn.disabled = false;
-        btn.innerText = 'Add to Cart 🛒';
+        btn.innerText = 'Add to Cart';
       }, 500);
     }
   })
   .catch(err => {
     console.error('Error adding to cart:', err);
     btn.disabled = false;
-    btn.innerText = 'Add to Cart 🛒';
+    btn.innerText = 'Add to Cart';
     closeCategoryModal();
   });
 }

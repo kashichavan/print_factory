@@ -1,0 +1,63 @@
+{% comment %}
+Dynamic Product Option Builder Component — The Print Planet
+{% endcomment %}
+<div class="glass-panel" style="padding:28px;background:#ffffff;margin-bottom:28px;border-radius:14px;border:1px solid #e2e8f0">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <h2 style="font:700 20px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.3px">Step 4: Product Options</h2>
+      <p style="margin:4px 0 0;font-size:13px;color:#64748b">Define customizable options for size, paper stock, fabric, or finish with price modifiers.</p>
+    </div>
+    <button type="button" class="button button-light" onclick="addOptionRow()" style="border-radius:8px;font-size:13px">Add Custom Option</button>
+  </div>
+
+  <div id="dynamic-options-list">
+    {% if product and product.options.exists %}
+      {% for option in product.options.all %}
+      <div class="dyn-row glass-panel" style="padding:18px;background:#f8fafc;margin-bottom:14px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
+          <label>
+            <b>Option Name</b>
+            <input type="text" name="dyn_option_name[]" value="{{ option.name }}" placeholder="e.g. Size or Material">
+          </label>
+          <label>
+            <b>Option Values (Label:PriceModifier)</b>
+            <input type="text" name="dyn_option_values[]" value="{% for v in option.values.all %}{{ v.label }}:{{ v.price_modifier }}{% if not forloop.last %}, {% endif %}{% endfor %}" placeholder="Label:PriceAdd">
+          </label>
+          <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove</button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <!-- Sample Option 1 -->
+      <div class="dyn-row glass-panel" style="padding:18px;background:#f8fafc;margin-bottom:14px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
+          <label>
+            <b>Option Name</b>
+            <input type="text" name="dyn_option_name[]" value="Paper Stock &amp; Finish" placeholder="e.g. Size or Material">
+          </label>
+          <label>
+            <b>Option Values (Label:PriceModifier)</b>
+            <input type="text" name="dyn_option_values[]" value="Standard Matte (300gsm):0, Premium Glossy (350gsm):40, Metallic Gold Foil:200" placeholder="Label:PriceAdd, Label2:PriceAdd2">
+          </label>
+          <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove</button>
+        </div>
+        <small style="color:#64748b;margin-top:6px;display:block">Syntax Example: <code>Matte 300gsm:0, Glossy 350gsm:40, Gold Foil:200</code></small>
+      </div>
+
+      <!-- Sample Option 2 -->
+      <div class="dyn-row glass-panel" style="padding:18px;background:#f8fafc;margin-bottom:14px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:16px;align-items:start">
+          <label>
+            <b>Option Name</b>
+            <input type="text" name="dyn_option_name[]" value="Corner Style" placeholder="e.g. Corner Shape">
+          </label>
+          <label>
+            <b>Option Values</b>
+            <input type="text" name="dyn_option_values[]" value="Standard Square:0, 4 Rounded Corners:50" placeholder="Label:PriceAdd">
+          </label>
+          <button type="button" class="cart-remove-btn" style="margin-top:28px" onclick="this.closest('.dyn-row').remove()">Remove</button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>

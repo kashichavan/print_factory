@@ -57,19 +57,5 @@
 </div>
 
 <!-- Pagination Controls -->
-{% if orders.has_other_pages %}
-<div class="vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px">
-  {% if orders.has_previous %}
-    <a href="?page={{ orders.previous_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">← Previous</a>
-  {% endif %}
-
-  <span style="font-size:13px;font-weight:700;color:var(--ink)">
-    Page {{ orders.number }} of {{ orders.paginator.num_pages }}
-  </span>
-
-  {% if orders.has_next %}
-    <a href="?page={{ orders.next_page_number }}&amp;status={{ selected_status|default:'' }}" class="vp-tab">Next →</a>
-  {% endif %}
-</div>
-{% endif %}
+{% include 'dashboard/components/pagination.html' with page_obj=orders %}
 {% endblock %}

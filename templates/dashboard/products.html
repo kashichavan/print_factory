@@ -3,79 +3,30 @@
 {% block title %}Catalog Products CRUD | Owner Dashboard{% endblock %}
 
 {% block dashboard_content %}
-<div class="dash-heading">
+<div class="dash-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
   <div>
-    <p class="eyebrow">CATALOGUE MANAGEMENT</p>
-    <h1>Products &amp; Pricing</h1>
+    <p class="eyebrow" style="margin:0 0 4px;font-size:12px;font-weight:800;letter-spacing:1px;color:#2563eb">CATALOGUE MANAGEMENT</p>
+    <h1 style="font:700 28px Fraunces,serif;margin:0;color:#1e2230">Products &amp; Dynamic Pricing</h1>
   </div>
-  <a class="button button-dark" href="{% url 'dashboard:product_create' %}">Add New Product <span>+</span></a>
+  <a class="button button-dark" href="{% url 'dashboard:product_create' %}" style="padding:10px 20px">
+    ➕ Add New Product
+  </a>
 </div>
 
-<!-- Search & Filter Bar -->
-<div class="glass-panel" style="padding:16px 20px;background:#ffffff;margin-bottom:24px;display:flex;align-items:center;justify-space-between">
-  <form method="get" style="display:flex;gap:10px;flex-grow:1;max-width:400px">
-    <input type="text" name="q" value="{{ search_query }}" placeholder="Search products..." style="flex-grow:1;padding:8px 14px;border:1px solid #1e223025;border-radius:99px;font:14px 'DM Sans'">
-    <button type="submit" class="button button-dark" style="padding:8px 16px;border-radius:99px">Search</button>
+<!-- Search Bar & Controls -->
+<div class="glass-panel" style="padding:16px 24px;background:#ffffff;margin-bottom:24px;border-radius:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,0.03)">
+  <form method="get" style="display:flex;gap:10px;flex-grow:1;max-width:440px">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="🔍 Search products by name..." style="flex-grow:1;padding:10px 16px;border:1px solid #e2e8f0;border-radius:10px;font:14px 'DM Sans', sans-serif">
+    <button type="submit" class="button button-dark" style="padding:10px 18px;border-radius:10px">Search</button>
   </form>
-  <span style="font-size:13px;color:var(--muted)">Showing {{ products.object_list|length }} of {{ products.paginator.count }} products</span>
-</div>
-
-<!-- Product Table with Images and Full CRUD Actions -->
-<div class="order-table glass-panel" style="padding:10px 20px;background:#ffffff">
-  <div class="table-row table-label" style="grid-template-columns:80px 1.4fr 1fr 0.8fr 0.8fr 1.2fr">
-    <span>Image</span>
-    <span>Product Name</span>
-    <span>Category</span>
-    <span>Base Price</span>
-    <span>Status</span>
-    <span>Actions</span>
-  </div>
-
-  {% for product in products %}
-  <div class="table-row" style="grid-template-columns:80px 1.4fr 1fr 0.8fr 0.8fr 1.2fr;align-items:center">
-    <span>
-      <img src="{{ product.get_image_url }}" alt="{{ product.name }}" style="width:50px;height:45px;object-fit:cover;border-radius:8px;border:1px solid #1e223015">
-    </span>
-    <span>
-      <b><a href="{% url 'content:product_detail' product.slug %}" target="_blank" style="text-decoration:none;color:inherit">{{ product.name }}</a></b>
-      <small>{{ product.short_description|truncatewords:6 }}</small>
-    </span>
-    <span><span class="spec-chip">{{ product.category.name }}</span></span>
-    <span><b>₹{{ product.base_price }}</b></span>
-    <span>
-      <form method="post" action="{% url 'dashboard:product_toggle' product.id %}" style="display:inline">
-        {% csrf_token %}
-        <button type="submit" class="status {% if product.is_active %}confirmed{% else %}cancelled{% endif %}" style="border:0;cursor:pointer" title="Click to toggle status">
-          {% if product.is_active %}Active ✓{% else %}Disabled ✕{% endif %}
-        </button>
-      </form>
-    </span>
-    <span style="display:flex;gap:8px;align-items:center">
-      <a href="{% url 'dashboard:product_edit' product.id %}" class="button button-dark" style="padding:6px 12px;font-size:12px;border-radius:6px">Edit ✏️</a>
-      <a href="{% url 'dashboard:product_delete' product.id %}" class="cart-remove-btn" style="font-size:12px">Delete 🗑️</a>
-    </span>
-  </div>
-  {% empty %}
-  <div class="empty" style="padding:40px 0;text-align:center">
-    <p>No products found in database matching search criteria.</p>
-  </div>
-  {% endfor %}
-</div>
-
-<!-- Pagination Controls -->
-{% if products.has_other_pages %}
-<div class="vp-pagination-bar" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px">
-  {% if products.has_previous %}
-    <a href="?page={{ products.previous_page_number }}&amp;q={{ search_query }}" class="vp-tab">← Previous</a>
-  {% endif %}
-
-  <span style="font-size:13px;font-weight:700;color:var(--ink)">
-    Page {{ products.number }} of {{ products.paginator.num_pages }}
+  <span style="font-size:13px;color:var(--muted);font-weight:500">
+    Showing <b>{{ products.object_list|length }}</b> of <b>{{ products.paginator.count }}</b> total products
   </span>
-
-  {% if products.has_next %}
-    <a href="?page={{ products.next_page_number }}&amp;q={{ search_query }}" class="vp-tab">Next →</a>
-  {% endif %}
 </div>
-{% endif %}
+
+<!-- Segregated Product Table Component -->
+{% include 'dashboard/components/product_table.html' with products=products %}
+
+<!-- Segregated Pagination Component -->
+{% include 'dashboard/components/pagination.html' with page_obj=products %}
 {% endblock %}

@@ -2,69 +2,68 @@
 {% block title %}Owner Dashboard Overview | The Print Planet{% endblock %}
 
 {% block dashboard_content %}
-<div class="dash-heading">
+<div class="dash-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
   <div>
-    <p class="eyebrow">STOREFRONT METRICS &amp; PRODUCTION</p>
-    <h1>Owner Overview</h1>
+    <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">METRICS &amp; OPERATIONS</p>
+    <h1 style="font:700 28px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.4px">Owner Overview</h1>
   </div>
   <div class="dash-actions">
-    <a class="button button-dark" href="{% url 'dashboard:product_create' %}">Add New Product <span>+</span></a>
+    <a class="button button-dark" href="{% url 'dashboard:product_create' %}" style="padding:10px 18px;border-radius:8px;background:#2563eb">Add Product</a>
   </div>
 </div>
 
 <!-- Key Stat Metrics Grid -->
-<div class="stat-grid" style="grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:40px">
-  <div class="glass-panel" style="padding:28px;background:#ffffff">
-    <span style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Active Catalog Products</span>
-    <strong style="font:700 48px/1 Fraunces,serif;color:var(--ink);display:block;margin:12px 0 4px">{{ product_count }}</strong>
-    <small style="color:#059669;font-weight:700">✓ Fully Seeded &amp; Online</small>
-  </div>
-
-  <div class="glass-panel" style="padding:28px;background:#ffffff">
-    <span style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Open Customer Orders</span>
-    <strong style="font:700 48px/1 Fraunces,serif;color:var(--ink);display:block;margin:12px 0 4px">{{ open_order_count }}</strong>
-    <small style="color:var(--orange);font-weight:700">⚡ Action Required</small>
-  </div>
-
-  <div class="glass-panel" style="padding:28px;background:#ffffff">
-    <span style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase">New Lead Enquiries</span>
-    <strong style="font:700 48px/1 Fraunces,serif;color:var(--ink);display:block;margin:12px 0 4px">{{ new_lead_count }}</strong>
-    <small style="color:#7c3aed;font-weight:700">📩 Pending Follow-Up</small>
-  </div>
+<div class="stat-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:36px">
+  {% include 'dashboard/components/stat_card.html' with card_title="Active Catalog Products" card_value=product_count card_subtitle="Fully Seeded & Online" card_label="CATALOG" %}
+  {% include 'dashboard/components/stat_card.html' with card_title="Open Customer Orders" card_value=open_order_count card_subtitle="Action Required" card_label="ORDERS" %}
+  {% include 'dashboard/components/stat_card.html' with card_title="New Lead Enquiries" card_value=new_lead_count card_subtitle="Pending Follow-Up" card_label="LEADS" %}
 </div>
 
 <!-- Recent Orders Table Section -->
 <section class="dash-section">
-  <div class="table-head">
-    <h2>Recent Customer Orders</h2>
-    <a class="text-link" href="{% url 'dashboard:order_list' %}">View All Orders →</a>
+  <div class="table-head" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <h2 style="font:700 20px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a">Recent Customer Orders</h2>
+    <a class="text-link" href="{% url 'dashboard:order_list' %}">View All Orders</a>
   </div>
 
-  <div class="order-table glass-panel" style="padding:10px 20px;background:#ffffff">
-    <div class="table-row table-label">
-      <span>Order Number &amp; Date</span>
-      <span>Customer Email</span>
-      <span>Status</span>
-      <span>Manage Order</span>
-    </div>
-
-    {% for order in recent_orders %}
-    <div class="table-row">
-      <span>
-        <b>{{ order.number }}</b>
-        <small>{{ order.created_at|date:'d M Y, H:i' }}</small>
-      </span>
-      <span>{{ order.customer.email|default:"Guest Buyer" }}</span>
-      <span>
-        <i class="status {{ order.status }}">{{ order.get_status_display }}</i>
-      </span>
-      <a href="{% url 'dashboard:order_detail' order.id %}" class="text-link">Manage Order →</a>
-    </div>
-    {% empty %}
-    <div class="empty" style="padding:40px 0;text-align:center">
-      <p>No recent orders found. New checkout orders will automatically populate here in real-time.</p>
-    </div>
-    {% endfor %}
+  <div class="order-table glass-panel" style="padding:0;overflow:hidden;border-radius:14px;background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(15,23,42,0.03)">
+    <table style="width:100%;border-collapse:collapse;text-align:left">
+      <thead>
+        <tr style="background:#eff6ff;border-bottom:1px solid #dbeafe;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:#64748b">
+          <th style="padding:14px 18px">Order Number &amp; Date</th>
+          <th style="padding:14px 18px">Customer Email</th>
+          <th style="padding:14px 18px">Status</th>
+          <th style="padding:14px 18px;text-align:right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:14px 18px">
+            <b style="font-size:14px;color:#0f172a;display:block">{{ order.number }}</b>
+            <small style="color:#64748b;font-size:11px">{{ order.created_at|date:'d M Y, H:i' }}</small>
+          </td>
+          <td style="padding:14px 18px;font-size:13px;color:#0f172a;font-weight:600">
+            {{ order.customer.email|default:"Guest Buyer" }}
+          </td>
+          <td style="padding:14px 18px">
+            <span class="status {{ order.status }}" style="font-size:11px;font-weight:700">
+              {{ order.get_status_display }}
+            </span>
+          </td>
+          <td style="padding:14px 18px;text-align:right">
+            <a href="{% url 'dashboard:order_detail' order.id %}" class="button button-dark" style="padding:6px 12px;font-size:12px;border-radius:6px;background:#2563eb">Manage Order</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="padding:30px;text-align:center;color:#64748b">
+            No recent orders found. New checkout orders will automatically populate here.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </section>
 {% endblock %}

@@ -5,110 +5,105 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="theme-color" content="#1e2230">
+  <meta name="theme-color" content="#0f172a">
   
-  <title>{% block title %}The Print Planet | Premium Vistaprint-Style Custom Printing{% endblock %}</title>
+  <title>{% block title %}The Print Planet | Custom Printing &amp; Packaging{% endblock %}</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
-  <!-- Top Flash Offer Announcement Bar -->
+  <!-- Top Flash Announcement Bar -->
   <div id="flash-banner" class="flash-banner">
-    <span>⚡ <strong>FLASH SALE:</strong> Get 20% OFF on all T-Shirts, ID Cards &amp; Business Cards! Use Code: <b>PRINT20</b></span>
+    <span>Get 20% OFF on T-Shirts, ID Cards &amp; Business Cards! Code: <b>PRINT20</b></span>
     <button type="button" class="flash-close" onclick="dismissFlashBanner()">✕</button>
   </div>
 
-  <!-- Single Unified Header Navigation (Desktop & Mobile) -->
+  <!-- Enterprise SaaS Header Navigation -->
   <header class="site-header">
     <div class="nav wrap">
-      <div style="display:flex;align-items:center;gap:14px">
-        <button class="vp-sidebar-btn" onclick="toggleSidebarDrawer()" aria-label="Open Navigation Drawer">
-          <span>☰</span> <b>Menu</b>
+      <!-- Left Brand & Categories Drawer Trigger -->
+      <div style="display:flex;align-items:center;gap:16px">
+        <a class="brand" href="{% url 'content:home' %}"><span>the print</span><span style="color:#2563eb">planet</span>.</a>
+        
+        <button type="button" class="vp-sidebar-btn" onclick="toggleSidebarDrawer()" aria-label="Open Categories Drawer">
+          <span>Categories</span>
         </button>
-        <a class="brand" href="{% url 'content:home' %}"><span>the print</span>planet<i>.</i></a>
       </div>
 
+      <!-- Center Primary Navigation -->
       <nav class="nav-links" id="main-nav-links">
-        {% for cat in nav_categories %}
-          <a href="{% url 'content:category_detail' cat.slug %}">{{ cat.name }}</a>
-        {% endfor %}
-        <a href="{% url 'content:services' %}">Services</a>
-        <a href="{% url 'content:shop' %}">Shop</a>
-        <a href="{% url 'content:contact' %}">Contact</a>
-        <a href="{% url 'orders:cart_detail' %}" class="nav-cart-link">
-          🛒 Cart <span id="cart-badge" class="cart-count-pill">0</span>
-        </a>
-        <a class="nav-cta" href="{% url 'content:contact' %}">Get a quote <span>→</span></a>
+        <a href="{% url 'content:shop' %}" class="{% if request.resolver_match.url_name == 'shop' %}active{% endif %}">Shop Catalog</a>
+        <a href="{% url 'content:services' %}" class="{% if request.resolver_match.url_name == 'services' %}active{% endif %}">Services</a>
+        <a href="{% url 'content:business_cards' %}" class="{% if request.resolver_match.url_name == 'business_cards' %}active{% endif %}">Business Cards</a>
+        <a href="{% url 'content:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
       </nav>
+
+      <!-- Right Action Cluster -->
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="{% url 'dashboard:home' %}" class="nav-cart-link" style="font-weight:600">
+          Owner Hub
+        </a>
+        <a href="{% url 'orders:cart_detail' %}" class="nav-cart-link">
+          Cart <span id="cart-badge" class="cart-count-pill">0</span>
+        </a>
+        <a class="nav-cta" href="{% url 'content:contact' %}">Get a Quote</a>
+      </div>
     </div>
   </header>
 
-  <!-- 100% Dynamic DB-Driven Category Side Drawer -->
+  <!-- Off-Canvas Category Side Drawer -->
   <div id="side-drawer-overlay" class="vp-drawer-overlay" onclick="closeSidebarDrawer()">
     <aside class="vp-side-drawer" onclick="event.stopPropagation()">
       <div class="vp-drawer-header">
-        <div class="brand" style="font-size:20px"><span>the print</span>planet<i>.</i></div>
+        <div class="brand" style="font-size:20px"><span>the print</span><span style="color:#2563eb">planet</span>.</div>
         <button class="vp-drawer-close" onclick="closeSidebarDrawer()">✕</button>
       </div>
 
       <div class="vp-drawer-body">
-        <div class="drawer-section-title">STOREFRONT CATEGORIES (LIVE DB)</div>
+        <div class="drawer-section-title">Product Categories</div>
         <nav class="drawer-nav">
           {% for cat in nav_categories %}
             <a href="{% url 'content:category_detail' cat.slug %}" class="drawer-link" onclick="closeSidebarDrawer()">
-              <span class="d-icon">{{ cat.icon }}</span>
-              <span>{{ cat.name }}</span>
+              <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+                <span style="font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ cat.name }}</span>
+                <small style="font-size:11px;color:#64748b;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ cat.description|truncatewords:5 }}</small>
+              </div>
               {% if cat.badge %}<small class="d-tag">{{ cat.badge }}</small>{% endif %}
             </a>
           {% empty %}
-            <span style="font-size:13px;color:var(--muted)">No categories found in DB</span>
+            <span style="font-size:13px;color:#64748b">No categories found</span>
           {% endfor %}
         </nav>
 
-        <div class="drawer-section-title" style="margin-top:28px">QUICK LINKS</div>
+        <div class="drawer-section-title" style="margin-top:28px">Quick Navigation</div>
         <nav class="drawer-nav">
-          <a href="{% url 'content:shop' %}" class="drawer-link" onclick="closeSidebarDrawer()">
-            <span class="d-icon">🛍️</span>
-            <span>Full Shop Catalogue</span>
-          </a>
-          <a href="{% url 'content:services' %}" class="drawer-link" onclick="closeSidebarDrawer()">
-            <span class="d-icon">🛠️</span>
-            <span>Production Services</span>
-          </a>
-          <a href="{% url 'orders:cart_detail' %}" class="drawer-link" onclick="closeSidebarDrawer()">
-            <span class="d-icon">🛒</span>
-            <span>View Shopping Cart</span>
-          </a>
-          <a href="{% url 'content:contact' %}" class="drawer-link" onclick="closeSidebarDrawer()">
-            <span class="d-icon">📩</span>
-            <span>Request Custom Quote</span>
-          </a>
-          <a href="{% url 'dashboard:home' %}" class="drawer-link" onclick="closeSidebarDrawer()">
-            <span class="d-icon">⚙️</span>
-            <span>Owner Command Center</span>
-          </a>
+          <a href="{% url 'content:shop' %}" class="drawer-link" onclick="closeSidebarDrawer()">Full Shop Catalog</a>
+          <a href="{% url 'content:services' %}" class="drawer-link" onclick="closeSidebarDrawer()">Production Services</a>
+          <a href="{% url 'orders:cart_detail' %}" class="drawer-link" onclick="closeSidebarDrawer()">View Cart</a>
+          <a href="{% url 'content:contact' %}" class="drawer-link" onclick="closeSidebarDrawer()">Request Custom Quote</a>
+          <a href="{% url 'dashboard:home' %}" class="drawer-link" onclick="closeSidebarDrawer()">Owner Control Center</a>
         </nav>
       </div>
 
       <div class="vp-drawer-footer">
-        <p>Need urgent printing assistance?</p>
-        <a href="tel:+919000000000" class="drawer-call-btn">📞 Call +91 90000 00000</a>
+        <p style="margin:0 0 4px;font-size:12px;color:#64748b">Need printing assistance?</p>
+        <a href="tel:+919000000000" class="drawer-call-btn" style="font-weight:700;color:#2563eb">Call +91 90000 00000</a>
       </div>
     </aside>
   </div>
 
   <!-- Global Toast Notification -->
   <div id="toast-container" class="toast-popup">
-    <span id="toast-message">Item added to cart!</span>
-    <a href="{% url 'orders:cart_detail' %}" class="toast-cart-btn">View Cart 🛒</a>
+    <span id="toast-message">Item added to cart</span>
+    <a href="{% url 'orders:cart_detail' %}" class="toast-cart-btn">View Cart</a>
   </div>
 
   <!-- Floating Quick Help Widget Pill -->
   <div id="floating-chat-pill" class="floating-chat-pill" onclick="window.location.href='{% url 'content:contact' %}'">
-    <span>💬 Need Custom Print Help?</span>
+    <span>Need Custom Print Help?</span>
   </div>
 
   {% if messages %}
@@ -123,16 +118,16 @@
 
   <footer>
     <div class="wrap footer-grid">
-      <a class="brand footer-brand" href="{% url 'content:home' %}"><span>the print</span>planet<i>.</i></a>
-      <p>Ideas, made tangible. Premium custom T-shirts, corporate ID cards, and business card printing.</p>
+      <a class="brand footer-brand" href="{% url 'content:home' %}" style="color:#ffffff"><span>the print</span><span style="color:#2563eb">planet</span>.</a>
+      <p>Ideas, made tangible. Custom T-shirts, corporate ID cards, and business card printing platform.</p>
       <div>
         <a href="{% url 'content:business_cards' %}">Business Cards</a>
         <a href="{% url 'content:services' %}">Services</a>
-        <a href="{% url 'content:shop' %}">Shop Catalogue</a>
-        <a href="{% url 'content:contact' %}">Contact us</a>
+        <a href="{% url 'content:shop' %}">Shop Catalog</a>
+        <a href="{% url 'content:contact' %}">Contact Us</a>
       </div>
     </div>
-    <div class="wrap copyright">© {% now 'Y' %} The Print Planet. Made with care.</div>
+    <div class="wrap copyright">© {% now 'Y' %} The Print Planet. All rights reserved.</div>
   </footer>
 
   <script src="{% static 'js/site.js' %}"></script>
@@ -180,7 +175,6 @@
       }
     }
 
-    // Fetch live cart count on load
     document.addEventListener('DOMContentLoaded', () => {
       fetch('/cart/count/')
         .then(r => r.json())
@@ -190,39 +184,6 @@
           }
         })
         .catch(e => console.log('Cart fetch:', e));
-        
-      // Automatic Infinite Scroll / Intersection Observer for Pagination
-      const paginationBar = document.querySelector('.vp-pagination-bar');
-      if (paginationBar) {
-        const nextLink = paginationBar.querySelector('a[href*="page="]:last-child');
-        if (nextLink && nextLink.innerText.includes('Next')) {
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                observer.unobserve(entry.target);
-                fetch(nextLink.href)
-                  .then(res => res.text())
-                  .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newCards = doc.querySelectorAll('.vp-catalog-grid .vp-product-card');
-                    const currentGrid = document.querySelector('.vp-catalog-grid');
-                    if (currentGrid && newCards.length > 0) {
-                      newCards.forEach(card => currentGrid.appendChild(card));
-                      const newPaginator = doc.querySelector('.vp-pagination-bar');
-                      if (newPaginator) {
-                        paginationBar.innerHTML = newPaginator.innerHTML;
-                      } else {
-                        paginationBar.remove();
-                      }
-                    }
-                  });
-              }
-            });
-          }, { threshold: 0.5 });
-          observer.observe(paginationBar);
-        }
-      }
     });
   </script>
 </body>

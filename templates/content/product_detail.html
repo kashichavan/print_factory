@@ -2,20 +2,20 @@
 {% block title %}{{ product.name }} | Detailed Specs &amp; Customization | The Print Planet{% endblock %}
 
 {% block content %}
-<!-- Flipkart / Amazon Style Breadcrumb Bar -->
+<!-- Breadcrumb Bar -->
 <div class="wrap vp-breadcrumb-bar">
   <a href="{% url 'content:home' %}">Home</a> &gt;
   <a href="{% url 'content:category_detail' product.category.slug %}">{{ product.category.name }}</a> &gt;
   <span>{{ product.name }}</span>
 </div>
 
-<!-- Main Product Detail Grid (Amazon / Flipkart Layout) -->
+<!-- Main Product Detail Grid -->
 <section class="wrap vp-product-detail-grid">
   <!-- Left Column: Gallery & Image Preview -->
   <div class="vp-gallery-col">
     <div class="vp-main-preview-card glass-panel">
       <img id="pdp-main-image" src="{{ product.get_image_url }}" alt="{{ product.name }}">
-      <span class="pdp-badge-pill">★ {{ product.badge|default:"Top Choice" }}</span>
+      <span class="pdp-badge-pill">{{ product.badge|default:"Top Choice" }}</span>
     </div>
 
     <!-- Image Thumbnail Carousel -->
@@ -37,38 +37,34 @@
     <!-- Trust Badges Block -->
     <div class="pdp-trust-block glass-panel">
       <div class="pdp-trust-item">
-        <span class="pdp-trust-icon">🚚</span>
         <div><b>Fast Dispatch</b><small>Standard 2-3 Business Days</small></div>
       </div>
       <div class="pdp-trust-item">
-        <span class="pdp-trust-icon">🔒</span>
-        <div><b>100% Quality Assurance</b><small>Free Reprint if Defective</small></div>
+        <div><b>Quality Assurance</b><small>Free Reprint if Defective</small></div>
       </div>
       <div class="pdp-trust-item">
-        <span class="pdp-trust-icon">🎨</span>
         <div><b>Color Match Guarantee</b><small>Pantone Calibration</small></div>
       </div>
     </div>
   </div>
 
-  <!-- Right Column: Interactive Buying & Customization Panel -->
+  <!-- Right Column: Interactive Buying Panel -->
   <div class="vp-buy-col glass-panel">
     <div class="pdp-header">
       <span class="pdp-category-tag">{{ product.category.name }}</span>
       <h1 class="pdp-title">{{ product.name }}</h1>
       <p class="pdp-short-desc">{{ product.short_description }}</p>
 
-      <!-- Rating & Review Count (Amazon / Flipkart Style) -->
       <div class="pdp-rating-row">
-        <span class="pdp-stars">★ {{ product.rating }}</span>
-        <span class="pdp-review-count">({{ product.review_count }} Verified Ratings &amp; Reviews)</span>
-        <span class="pdp-stock-status">✓ In Stock &amp; Ready to Print</span>
+        <span class="pdp-stars">Rating: {{ product.rating }}</span>
+        <span class="pdp-review-count">({{ product.review_count }} Ratings &amp; Reviews)</span>
+        <span class="pdp-stock-status">In Stock &amp; Ready to Print</span>
       </div>
     </div>
 
     <div class="pdp-divider"></div>
 
-    <!-- Flipkart Dynamic Pricing Bar -->
+    <!-- Pricing Bar -->
     <div class="pdp-price-box">
       <div class="pdp-price-main">
         <span class="pdp-currency">₹</span>
@@ -81,7 +77,7 @@
 
     <!-- Dynamic DB Rendered Option Selectors -->
     <div class="pdp-options-container" id="pdp-dynamic-options-container">
-      <div style="padding:20px 0;color:var(--muted)">Loading product options from database... ⏳</div>
+      <div style="padding:20px 0;color:#64748b">Loading product options...</div>
     </div>
 
     <!-- Pincode Delivery Checker -->
@@ -91,20 +87,20 @@
         <input type="text" id="pincode-input" placeholder="Enter 6-digit Pincode" value="560001">
         <button type="button" onclick="checkPincode()">Check</button>
       </div>
-      <small id="pincode-result" style="color:#059669;font-weight:700;display:block;margin-top:6px">✓ Express Delivery Available by Thursday</small>
+      <small id="pincode-result" style="color:#2563eb;font-weight:700;display:block;margin-top:6px">Express Delivery Available by Thursday</small>
     </div>
 
     <!-- Artwork Upload Box -->
     <div class="vp-file-upload-box" style="margin-bottom:24px">
-      <p>📁 <b>Upload Custom Logo / Artwork File</b></p>
+      <p><b>Upload Custom Logo / Artwork File</b></p>
       <small>Supported Formats: PDF, AI, PSD, SVG, PNG (Max 50MB)</small>
       <input type="file" class="vp-file-input">
     </div>
 
-    <!-- Flipkart Dual Action CTA Buttons -->
+    <!-- Dual Action CTA Buttons -->
     <div class="pdp-action-bar">
-      <button type="button" id="pdp-cart-btn" class="pdp-btn-cart" onclick="submitPdpAddToCart(false)">Add to Cart 🛒</button>
-      <button type="button" id="pdp-buy-btn" class="pdp-btn-buy" onclick="submitPdpAddToCart(true)">Buy Now ⚡</button>
+      <button type="button" id="pdp-cart-btn" class="pdp-btn-cart" onclick="submitPdpAddToCart(false)">Add to Cart</button>
+      <button type="button" id="pdp-buy-btn" class="pdp-btn-buy" onclick="submitPdpAddToCart(true)">Buy Now</button>
     </div>
   </div>
 </section>
@@ -112,8 +108,8 @@
 <!-- Product Tabs (Details, Specs, Reviews) -->
 <section class="wrap vp-pdp-tabs-section">
   <div class="glass-panel" style="padding:35px;background:#ffffff">
-    <h2 style="font:700 28px Fraunces,serif;margin:0 0 16px">Product Overview &amp; Specifications</h2>
-    <p style="font-size:15px;color:#555760;line-height:1.6;margin-bottom:24px">{{ product.description|default:product.short_description }}</p>
+    <h2 style="font:700 28px 'Fraunces', serif;margin:0 0 16px;color:#0f172a">Product Overview &amp; Specifications</h2>
+    <p style="font-size:15px;color:#64748b;line-height:1.6;margin-bottom:24px">{{ product.description|default:product.short_description }}</p>
 
     <div class="pdp-specs-table">
       <div class="pdp-spec-row"><span>Product Category</span><b>{{ product.category.name }}</b></div>
@@ -134,7 +130,6 @@ function switchMainImage(imgUrl, thumbEl) {
   thumbEl.classList.add('active');
 }
 
-// Fetch 100% DB-driven options & price rules on page load
 document.addEventListener('DOMContentLoaded', () => {
   fetch(`/api/catalog/api/product/${pdpProductId}/options/`)
     .then(r => r.json())
@@ -153,11 +148,10 @@ function renderPdpDynamicOptions(product) {
   const container = document.getElementById('pdp-dynamic-options-container');
   container.innerHTML = '';
 
-  // 1. Quantity Tiers from DB price_rules
   if (product.price_rules && product.price_rules.length > 0) {
     const qtyGroup = document.createElement('div');
     qtyGroup.className = 'pdp-option-group';
-    qtyGroup.innerHTML = '<label class="pdp-option-label">1. Select Quantity Tier (DB Driven)</label>';
+    qtyGroup.innerHTML = '<label class="pdp-option-label">1. Select Quantity Tier</label>';
 
     const qtyGrid = document.createElement('div');
     qtyGrid.className = 'vp-qty-grid';
@@ -178,7 +172,6 @@ function renderPdpDynamicOptions(product) {
     container.appendChild(qtyGroup);
   }
 
-  // 2. Options & Values from DB
   if (product.options && product.options.length > 0) {
     product.options.forEach((opt, optIdx) => {
       const optGroup = document.createElement('div');
@@ -246,7 +239,7 @@ function checkPincode() {
   const code = document.getElementById('pincode-input').value.trim();
   const res = document.getElementById('pincode-result');
   if (code.length === 6) {
-    res.innerText = `✓ Express Delivery available to Pincode ${code} by Thursday`;
+    res.innerText = `Express Delivery available to Pincode ${code} by Thursday`;
   } else {
     res.innerText = 'Please enter a valid 6-digit Indian Pincode';
   }
@@ -260,9 +253,9 @@ function submitPdpAddToCart(redirectCheckout) {
   buyBtn.disabled = true;
 
   if (!redirectCheckout) {
-    cartBtn.innerText = 'Adding... ⏳';
+    cartBtn.innerText = 'Adding...';
   } else {
-    buyBtn.innerText = 'Redirecting... ⚡';
+    buyBtn.innerText = 'Redirecting...';
   }
 
   const qtyBtn = document.querySelector('#pdp-dynamic-options-container .vp-qty-btn.active');
@@ -295,13 +288,13 @@ function submitPdpAddToCart(redirectCheckout) {
       if (redirectCheckout) {
         window.location.href = '/cart/';
       } else {
-        cartBtn.innerText = 'Added! ✓';
+        cartBtn.innerText = 'Added!';
         showToast(data.message);
         setTimeout(() => {
           cartBtn.disabled = false;
           buyBtn.disabled = false;
-          cartBtn.innerText = 'Add to Cart 🛒';
-          buyBtn.innerText = 'Buy Now ⚡';
+          cartBtn.innerText = 'Add to Cart';
+          buyBtn.innerText = 'Buy Now';
         }, 600);
       }
     }
@@ -310,8 +303,8 @@ function submitPdpAddToCart(redirectCheckout) {
     console.error('Error adding to cart:', err);
     cartBtn.disabled = false;
     buyBtn.disabled = false;
-    cartBtn.innerText = 'Add to Cart 🛒';
-    buyBtn.innerText = 'Buy Now ⚡';
+    cartBtn.innerText = 'Add to Cart';
+    buyBtn.innerText = 'Buy Now';
   });
 }
 

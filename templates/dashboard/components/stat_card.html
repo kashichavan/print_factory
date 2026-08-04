@@ -1,0 +1,15 @@
+{% comment %}
+Clean Stat Card Component — The Print Planet
+{% endcomment %}
+<div class="glass-panel" style="padding:22px;border-radius:14px;background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(15,23,42,0.03);display:flex;align-items:center;justify-content:space-between">
+  <div>
+    <span style="font-size:11px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#64748b">{{ card_title }}</span>
+    <h2 style="font:800 28px 'Plus Jakarta Sans', sans-serif;margin:4px 0;color:#0f172a;letter-spacing:-0.5px">{{ card_value }}</h2>
+    {% if card_subtitle %}
+      <small style="color:#2563eb;font-weight:600;font-size:12px">{{ card_subtitle }}</small>
+    {% endif %}
+  </div>
+  <div style="width:44px;height:44px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">
+    {{ card_label|default:"STAT" }}
+  </div>
+</div>

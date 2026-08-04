@@ -3,29 +3,28 @@
 {% block title %}Manage Order #{{ order.number }} | Owner Dashboard{% endblock %}
 
 {% block dashboard_content %}
-<div class="dash-heading">
+<div class="dash-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
   <div>
-    <p class="eyebrow">ORDER MANAGEMENT</p>
-    <h1>Order #{{ order.number }}</h1>
-    <p class="dash-copy">Placed on {{ order.created_at|date:'d F Y, H:i' }}</p>
+    <p class="eyebrow" style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1px;color:#2563eb">ORDER MANAGEMENT</p>
+    <h1 style="font:700 28px 'Plus Jakarta Sans', sans-serif;margin:0;color:#0f172a;letter-spacing:-0.4px">Order #{{ order.number }}</h1>
+    <p style="margin:4px 0 0;font-size:13px;color:#64748b">Placed on {{ order.created_at|date:'d F Y, H:i' }}</p>
   </div>
-  <a href="{% url 'dashboard:order_list' %}" class="text-link">← Back to Orders</a>
+  <a href="{% url 'dashboard:order_list' %}" class="text-link">Back to Orders</a>
 </div>
 
-<div class="order-detail-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:30px">
-  <!-- Left Column: Items & Customer Feedback -->
+<div class="order-detail-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:24px">
+  <!-- Left Column: Items & Customer Details -->
   <div>
-    <!-- Order Items Table -->
-    <div class="glass-panel" style="padding:28px;background:#ffffff;margin-bottom:30px">
-      <h2 style="font:700 24px Fraunces,serif;margin:0 0 20px">Ordered Items</h2>
+    <div class="glass-panel" style="padding:24px;background:#ffffff;margin-bottom:24px;border-radius:14px;border:1px solid #e2e8f0">
+      <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Ordered Items</h2>
 
       {% for item in order.items.all %}
-      <div class="cart-item-card" style="margin-bottom:16px">
+      <div class="cart-item-card" style="margin-bottom:12px">
         <div class="cart-item-media">
           <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
         </div>
         <div class="cart-item-details">
-          <h3>{{ item.product.name }}</h3>
+          <h3 style="font-size:16px;margin:0 0 4px;color:#0f172a">{{ item.product.name }}</h3>
           <div class="cart-spec-badges">
             <span class="spec-chip">Qty: {{ item.quantity }} pcs</span>
             {% if item.unit_price %}
@@ -38,22 +37,22 @@
         </div>
       </div>
       {% empty %}
-      <p style="color:var(--muted)">No item records linked.</p>
+      <p style="color:#64748b;font-size:13px">No item records linked.</p>
       {% endfor %}
 
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #1e223015;display:flex;justify-content:space-between">
-        <span>Grand Total Amount</span>
-        <strong style="font-size:24px;color:var(--ink)">₹{{ order.total_amount }}</strong>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:600;color:#64748b">Grand Total Amount</span>
+        <strong style="font-size:22px;color:#0f172a">₹{{ order.total_amount }}</strong>
       </div>
     </div>
 
-    <!-- Customer Feedback & Approval Card -->
-    <div class="glass-panel" style="padding:28px;background:#ffffff">
-      <h2 style="font:700 24px Fraunces,serif;margin:0 0 16px">Customer Artwork Approval &amp; Feedback</h2>
+    <!-- Customer Artwork Approval Card -->
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Customer Artwork Approval</h2>
       <div class="pdp-specs-table">
         <div class="pdp-spec-row">
-          <span>Artwork File Proof Status</span>
-          <b style="color:#059669">✓ Approved by Customer</b>
+          <span>Artwork Proof Status</span>
+          <b style="color:#2563eb">Approved by Customer</b>
         </div>
         <div class="pdp-spec-row">
           <span>Production Job Number</span>
@@ -69,8 +68,8 @@
 
   <!-- Right Column: Status & Carrier Tracking Form -->
   <div>
-    <div class="glass-panel" style="padding:28px;background:#ffffff">
-      <h2 style="font:700 24px Fraunces,serif;margin:0 0 20px">Update Order Status</h2>
+    <div class="glass-panel" style="padding:24px;background:#ffffff;border-radius:14px;border:1px solid #e2e8f0">
+      <h2 style="font:700 18px 'Plus Jakarta Sans', sans-serif;margin:0 0 16px;color:#0f172a">Update Order Status</h2>
 
       <form method="post" class="dash-dynamic-form">
         {% csrf_token %}
@@ -94,7 +93,7 @@
           {{ form.notes }}
         </label>
 
-        <button type="submit" class="button button-dark" style="width:100%;margin-top:12px;justify-content:center">Save Order Update ↗</button>
+        <button type="submit" class="button button-dark" style="width:100%;margin-top:14px;justify-content:center;padding:12px;border-radius:8px;background:#2563eb">Save Order Update</button>
       </form>
     </div>
   </div>
