@@ -984,11 +984,11 @@ footer { background: var(--ink); color: white; padding: 50px 0 20px; margin-top:
   background: #ffffff;
   border: 1px solid var(--subtle-border);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
-  margin: 28px 0;
+  margin-top: 32px;
+  margin-bottom: 50px;
   flex-wrap: wrap;
   gap: 12px;
   box-sizing: border-box;
-  width: 100%;
 }
 
 .pagination-info {
