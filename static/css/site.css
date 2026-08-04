@@ -768,3 +768,12 @@ footer { background: var(--ink); color: white; padding: 50px 0 20px; margin-top:
   .nav-links { display: none; }
   .floating-chat-pill { display: none; }
 }
+
+@media (max-width: 600px) {
+  .site-header { padding: 10px 0; }
+  .brand { font-size: 18px; letter-spacing: -0.5px; }
+  .vp-sidebar-btn { padding: 6px 10px; font-size: 11px; gap: 4px; }
+  .nav-cart-link { padding: 6px 10px; font-size: 12px; }
+  .nav-cta { display: none; } /* Hide CTA button from top bar on small screens to fit cleanly */
+  .wrap { padding-left: 16px; padding-right: 16px; }
+}
