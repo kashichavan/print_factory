@@ -4,3 +4,7 @@ set -o errexit
 
 pip install -r requirements.txt
 python manage.py collectstatic --noinput
+
+# Reset database schema and run migrations
+python manage.py reset_db_schema || true
+python manage.py migrate || true
