@@ -110,10 +110,13 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_REFERRER_POLICY = "same-origin"
 
+# Proxy & HTTPS configuration for Render/cloud deployment
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Session Security
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 86400  # 24 hours
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -132,6 +135,8 @@ CACHES = {
 }
 
 LOGIN_URL = "/owner/login/"
+LOGIN_REDIRECT_URL = "/owner/"
+LOGOUT_REDIRECT_URL = "/owner/login/"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*",
