@@ -8,3 +8,4 @@ python manage.py collectstatic --noinput
 # Reset database schema and run migrations
 python manage.py reset_db_schema || true
 python manage.py migrate || true
+python manage.py create_admin_user || true
